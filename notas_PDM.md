@@ -418,7 +418,7 @@ As you develop reusable composables, you often want to expose both a stateful an
   - State should be hoisted to at least the lowest common parent of all composables that use the state (read).
   - State should be hoisted to at least the highest level it may be changed (write).
   - If two states change in response to the same events they should be hoisted together.
-- You can hoist state higher than these rules require, but underhoisting state makes it difficult or impossible to follow unidirectional data flow.
+- You can hoist state higher than these rules require, but under hoisting state makes it difficult or impossible to follow unidirectional data flow.
 
 ## Restoring state in Compose
 
@@ -431,7 +431,6 @@ As you develop reusable composables, you often want to expose both a stateful an
 - Parcelize
   - The simplest solution is to add the @Parcelize annotation to the object. The object becomes parcelable, and can be bundled. For example, this code makes a parcelable City data type and saves it to the state.
 
-
 ```kotlin
 @Parcelize
 data class City(val name: String, val country: String) : Parcelable
@@ -443,6 +442,7 @@ fun CityScreen() {
     }
 }
 ```
+
 - MapSaver
 - ListSaver
 
@@ -457,6 +457,14 @@ The remember API is frequently used together with MutableState:
 ## Store state with keys beyond recomposition
 
 - The rememberSaveable API is a wrapper around remember that can store data in a Bundle. This API allows state to survive not only recomposition, but also activity recreation and system-initiated process death. rememberSaveable receives input parameters for the same purpose that remember receives keys. The cache is invalidated when any of the inputs change. The next time the function recomposes, rememberSaveable re-executes the calculation lambda block.
+
+```kotlin
+var userTypedQuery by rememberSaveable(typedQuery, stateSaver = TextFieldValue.Saver) {
+  mutableStateOf(
+    TextFieldValue(text = typedQuery, selection = TextRange(typedQuery.length))
+    )
+    }
+```
 
 ## State in composables
 
@@ -480,13 +488,29 @@ The remember API is frequently used together with MutableState:
 
 # State management introduction
 
-- [ViewModel: purpose and motivation](https://developer.android.com/topic/libraries/architecture/viewmodel)
-  - [Lifecycle](https://developer.android.com/topic/libraries/architecture/viewmodel#lifecycle)
-  - Preserving state across configuration changes using a view model
-  - The view model as an alternative execution host
+## [ViewModel: purpose and motivation](https://developer.android.com/topic/libraries/architecture/viewmodel)
+
+- Lifecycle
+- Preserving state across configuration changes using a view model
+- The view model as an alternative execution host
+
+- The ViewModel class is a business logic or screen state holder. It exposes state to the UI and encapsulates related business logic. Its principal advantage is that it catches state and persists it through configuration changes. This means that your UI doesn't have to fetch data again when navigation between activities, or following configuration changes, such as when rotating screen.
+
+- Figure 1 illustrates the various lifecycle states of an activity as it undergoes a rotation and the is finished. The illustration also shows the lifetime of the ViewModel nest to the associated activity lifecycle. This particular diagram illustrates the states of an activity. The same basic states apply to the lifecycle of a fragment
+
+![ViewModel rotation](viewmodel-lifecycle.png)
+
 - [Android Application class](https://developer.android.com/reference/android/app/Application)
   - Motivation and lifecycle
   - Using Application for [manual dependency injection](https://developer.android.com/training/dependency-injection/manual#basics-manual-di)
+
+![Manual Dependency Injection](final-architecture.png)
+
+- Conclusion
+  - Dependency injection is a good technique for creating scalable and testable Android apps. Use containers as a way to share instances of classes in different parts of your app and as a centralized place to create instances of classes using factories.
+
+  - When your application gets larger, you will start seeing that you write a lot of boilerplate code (such as factories), which can be error-prone. You also have to manage the scope and lifecycle of the containers yourself, optimizing and discarding containers that are no longer needed in order to free up memory. Doing this incorrectly can lead to subtle bugs and memory leaks in your app.
+
 - Automated tests in Android: introduction
   - Local tests
   - Instrumented tests
@@ -495,11 +519,69 @@ The remember API is frequently used together with MutableState:
 
 # Building a UI: navigation
 
-- Navigation between Activities
-  - [Intents (explicit and implicit) and intent filters](https://developer.android.com/guide/components/intents-filters)
-    - [Sending the user to another app](https://developer.android.com/training/basics/intents/sending)
-    - [Common Intents](https://developer.android.com/guide/components/intents-common)
-  - [User task and back stack](https://developer.android.com/guide/components/activities/tasks-and-back-stack)
+## Navigation between Activities
+
+### [Intents (explicit and implicit) and intent filters](https://developer.android.com/guide/components/intents-filters)
+
+- An Intent is a messaging object you can use to request an action from another app component. Although intents facilitate communication between components in several ways, there are three fundamental use cases:
+  - Starting an activity
+    - An Activity represents a single screen in an app. You can start a new instance of an Activity by passing an Intent to startActivity(). The Intent describes the activity to start and carries any necessary data.
+  - Starting a service
+    - A Service is a component that performs operations in the background without a user interface. You can start a service with [JobScheduler](https://developer.android.com/reference/android/app/job/JobScheduler)
+  - Delivering a broadcast
+    - A broadcast is a message that any app can receive. The system delivers various broadcasts for system events, such as when the system boots up or the device starts charging. You can deliver a broadcast to other apps by passing an Intent to sendBroadcast()
+
+#### Intent types
+
+- Explicit intents specify which application will satisfy the intent, by supplying either the target app's package name or fully-qualified component class name. You'll typically use an explicit intent to start a component in your own app, because you know the class name of the activity or service you want to start. For example, you might start a new activity within your app in response to a user action, or start a service to download a file in the background.
+
+- Implicit intent do not name a specific component, but instead declare a general action to perform, which allows a component from another app to handle it. For example, if you want to show the user a location on a map, you can use an implicit intent to request that another capable app show a specified location on a map.
+
+![Intent filters](intent-filters_2x.png)
+  Figure. How an implicit is delivered through the system to start another activity. [1] Activity A creates an Intent with an action description and passes it to ``startActivity()``. [2] The Android System searches all apps for an intent filter that matches the intent. When a match is found, [3] the system starts the matching activity (Activity B) by invoking its onCreate() method and passing it the Intent.
+
+- __Caution:__ To ensure that your app is secure, always use an explicit intent when starting a Service and do not declare intent filters for your services. Using an implicit intent to start a service is a security hazard because you can't be certain what service will respond to the intent, and the user can't see which service starts.
+
+  - [Sending the user to another app](https://developer.android.com/training/basics/intents/sending)
+  - [Common Intents](https://developer.android.com/guide/components/intents-common)
+
+## [User task and back stack](https://developer.android.com/guide/components/activities/tasks-and-back-stack)
+
+- A task is a collection of activities that users interact with when trying to do something in your app. These activities are arranged in a stack called the _back stack_ in the order in which each activity is opened.
+
+- For example, an email app might have one activity to show a list of new messages. When the user selects a message, a new activity open to view that message. This new activity is added to the back stack. Then, when the user taps or gestures Back, that new activity finishes and is popped off the stack.
+
+### Lifecycle of a task and its back stack
+
+- The device Home screen is the starting place for most tasks. When a user touches the icon for an app or shortcut in the app launcher or on the Home screen, that app's task comes to the foreground. If no task exists for the app, then a new task is created and the main activity for that app opens as the root activity in the stack.
+
+- When the current activity starts another, the new activity is pushed on the top of the stack and takes focus. The previous activity remains in the stack, but is stopped. When an activity is stopped, the system retains the current state of its user interface. When the user performs the back action, the current activity is popped from the top of the stack and destroyed. The previous activity resumes, and the previous state of its UI is restores.
+
+- Activities in the stack are never rearranged, only pushed onto and popped from the stack as they are started by the current activity and dismissed by the user through the Back button or gesture. Therefore, the back stack operates as a l__ast in, first out__ object structure. Figure 1 shows a timeline with activities being pushed onto and popped from a back stack
+
+![diagram_backstack](diagram_backstack.png)
+
+- __Figure 1.__ A representation of how each new activity in a task adds an item to the back stack. When the user taps or gestures Back, the current activity is destroyed and the previous activity resumes
+
+  - As the user continues to tap or gesture Back, each activity in the stack is popped off to reveal the previous one, until the user returns to the Home screen or to whichever activity was running when the task began. When all activities are removed from the stack, the task no longer exists.
+
+  __Note:__ Multiple tasks can be held in the background at once. However, if the user run many background tasks at the same time, the system might begin destroying background activities to recover memory. If this happens, the activity states are lost.
+
+### Multiple activity instances
+
+![diagram_tasks](diagram_multiple_instances.png)
+
+- Because the activities in the back stack are never rearranged, if your app lets users start a particular activity from more than one activity, a new instance of that activity is created and pushed onto the stack, rather then bringing any previous instance of the activity to the yop. As such, one activity in your app might be instantiated multiple times, even from different tasks, as shown in the figure.
+
+- If the user navigates backward using the Back button or gesture, the instances of the activity are revealed in the order they opened, each with its own UI state. However, you can modify this behavior if you don't want an activity instantiated more than once. [MANAGING TASKS](https://developer.android.com/guide/components/activities/tasks-and-back-stack#ManagingTasks)
+
+### Lifecycle recap
+
+- To summarize the default behavior for activities and tasks:
+
+  - When Activity A starts Activity B, Activity A is stopped but the system retains its state, such as its scroll position and any text entered into forms. If the user taps or uses the Back gesture while in Activity B, Activity A resumes with its state restored.
+  - When the user leaves a task using the Home button or gesture, the current activity is stopped and its task goes into the background. The system retains the state of every activity in the task. If the user later resumes the task by selecting the launcher icon that began the task, the task comes to the foreground and resumes the activity at the top of the stack.
+  - If the user taps or gesture Back, the current activity is popped from the stack and destroyed. The previous activity in the stack resumes. When an activity is destroyed, the system does not retain the activity's state.
 
 - [Using material components and layouts](https://developer.android.com/jetpack/compose/layouts/material)
 
@@ -602,13 +684,15 @@ The remember API is frequently used together with MutableState:
     - [Documents, collections and references](https://firebase.google.com/docs/firestore/data-model)
     - [Data types](https://firebase.google.com/docs/firestore/manage-data/data-types)
   - Android SDK API overview:
-    - [Adding, updating](https://firebase.google.com/docs/firestore/manage-data/add-data) and [deleting]() data
+    - [Adding, updating](https://firebase.google.com/docs/firestore/manage-data/add-data) and [deleting](https://firebase.google.com/docs/firestore/manage-data/delete-data) data
     - Reading data
       - [Queries](https://firebase.google.com/docs/firestore/query-data/get-data) and [observable queries](https://firebase.google.com/docs/firestore/query-data/listen)
 
 - [Adding Firebase to an Android project](https://firebase.google.com/docs/android/setup?hl=en&authuser=0)
 - [Getting started with Firebase emulator](https://firebase.google.com/docs/emulator-suite/connect_and_prototype?database=Firestore)
 - [Connecting the app to the Firebase emulator](https://firebase.google.com/docs/emulator-suite/connect_firestore)
+
+- [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
 - [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
