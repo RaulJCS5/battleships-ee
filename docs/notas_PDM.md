@@ -597,7 +597,9 @@ var userTypedQuery by rememberSaveable(typedQuery, stateSaver = TextFieldValue.S
   - Bridging between OkHttp's and Kotlin's concurrency models
 - Json serialization and deserialization with [Gson](https://github.com/google/gson)
 
-- [Kotlin coroutines on Android](https://developer.android.com/kotlin/coroutines)
+# [Kotlin coroutines on Android](https://developer.android.com/kotlin/coroutines)
+
+## [Improve app performance with Kotlin coroutines](https://developer.android.com/kotlin/coroutines/coroutines-adv)
 
 - [Siren media type](https://github.com/kevinswiber/siren)
 - [ngrok](https://ngrok.com/)
@@ -615,6 +617,7 @@ var userTypedQuery by rememberSaveable(typedQuery, stateSaver = TextFieldValue.S
   - [Restoring state in Jetpack Compose: rememberSaveable](https://developer.android.com/jetpack/compose/state#restore-ui-state)
 
 - [Lists and grids](https://developer.android.com/jetpack/compose/lists)
+  - How to use Lazy
 - [Animations in Jetpack Compose](https://developer.android.com/jetpack/compose/animation)
 
 - Considerations on the design of Android applications
