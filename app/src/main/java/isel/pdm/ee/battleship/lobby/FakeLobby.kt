@@ -1,15 +1,22 @@
 package isel.pdm.ee.battleship.lobby
 
 import isel.pdm.ee.battleship.lobby.domain.*
+import isel.pdm.ee.battleship.preferences.domain.UserInfo
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 
-class FakeLobby : Lobby {
+class FakeLobby() : Lobby {
     private var state: LobbyState = Idle
     private val list = mutableListOf<PlayerInfo>()
+
+    init {
+        repeat(10) {
+            list.add(PlayerInfo(UserInfo("Nick$it", "Moto$it")))
+        }
+    }
     override suspend fun getPlayers(): List<PlayerInfo> {
         return list
     }
