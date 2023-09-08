@@ -9,6 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import isel.pdm.ee.battleship.DependenciesContainer
 import isel.pdm.ee.battleship.TAG
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
@@ -49,17 +51,18 @@ class LobbyActivity : ComponentActivity() {
                 }
             )
         }
+        lifecycle.addObserver(object : DefaultLifecycleObserver{
+            override fun onStart(owner: LifecycleOwner) {
+                super.onStart(owner)
+                Log.v(TAG, "LobbyActivity::onStart")
+                viewModel.enterLobby()
+            }
+            override fun onStop(owner: LifecycleOwner) {
+                super.onStop(owner)
+                Log.v(TAG, "LobbyActivity::onStop")
+                viewModel.leaveLobby()
+            }
+        })
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.v(TAG, "onStart")
-        viewModel.enterLobby()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.v(TAG, "onStop")
-        viewModel.leaveLobby()
-    }
 }

@@ -1,6 +1,10 @@
 package isel.pdm.ee.battleship.lobby
 
 import isel.pdm.ee.battleship.preferences.domain.UserInfo
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.util.UUID
 
 /**
  * Abstraction that characterizes the game's lobby.
@@ -11,6 +15,8 @@ interface Lobby {
      * @return the list of players currently in the lobby
      */
     suspend fun getPlayers(): List<PlayerInfo>
+
+    val players: Flow<List<PlayerInfo>>
 
     /**
      * Enters the lobby. It cannot be entered again until left.
@@ -33,7 +39,7 @@ class FakeLobby : Lobby {
     override suspend fun getPlayers(): List<PlayerInfo> {
         val list = buildList {
             repeat(5) {
-                add(PlayerInfo(UserInfo("Nick$it", "$count This is my $it moto"), id = java.util.UUID.randomUUID()))
+                add(PlayerInfo(UserInfo("Nick$it", "$count This is my $it moto"), id = UUID.randomUUID()))
             }
         }
         count++
@@ -47,4 +53,12 @@ class FakeLobby : Lobby {
     override suspend fun leave() {
         TODO()
     }
+
+    override val players: Flow<List<PlayerInfo>>
+        get() = flow {
+            while(true) {
+                delay(5000)
+                emit(getPlayers())
+            }
+        }
 }

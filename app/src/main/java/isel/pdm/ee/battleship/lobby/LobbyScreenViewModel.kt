@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import isel.pdm.ee.battleship.TAG
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -26,14 +25,17 @@ class LobbyScreenViewModel(
 
     /**
      * Enters the lobby.
+     * collects the list of players in the lobby and updates the [_players] flow.
+     * if appears a new element in the list of players, it will be added to the [_players] flow.
+     * each time appears a new element in the list of players, it will be added to the [_players] flow.
+     * publishing in a MutableStateFlow will trigger a recomposition of the UI.
      */
     fun enterLobby(){
         if(lobbyMonitor == null) {
             lobbyMonitor = viewModelScope.launch {
-                while (true) {
-                    _players.value = lobby.getPlayers()
-                    Log.v(TAG, "Players: ${_players.value}")
-                    delay(5000)
+                lobby.players.collect { players ->
+                    _players.value = players
+                    Log.v(TAG, "LobbyScreenViewModel: enterLobby: players: ${players.size}")
                 }
             }
         }
