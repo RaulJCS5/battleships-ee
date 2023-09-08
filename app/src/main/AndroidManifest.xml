@@ -25,7 +25,8 @@
         <activity
             android:name=".preferences.ui.PreferencesActivity"
             android:exported="false"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
             android:name=".lobby.LobbyActivity"

@@ -7,7 +7,6 @@ import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import isel.pdm.ee.battleship.lobby.domain.PlayersInLobbyUpdate
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -24,6 +23,7 @@ class LobbyScreenViewModel(
     val players = _players.asStateFlow()
 
     private var lobbyMonitor: Job? = null
+    private var localPlayer: PlayerInfo? = null
 
     /**
      * Enters the lobby.
@@ -35,9 +35,9 @@ class LobbyScreenViewModel(
      */
     fun enterLobby(): Job? {
         if (lobbyMonitor == null) {
+            val localPlayerUpdate = PlayerInfo(checkNotNull(userInfoRepo.userInfo))
             lobbyMonitor = viewModelScope.launch {
-                val localPlayer = PlayerInfo(checkNotNull(userInfoRepo.userInfo))
-                lobby.enterAndObserve(localPlayer).collect { event ->
+                lobby.enterAndObserve(localPlayerUpdate).collect { event ->
                     when (event) {
                         is PlayersInLobbyUpdate -> {
                             _players.value = event.players.filter {
@@ -46,9 +46,14 @@ class LobbyScreenViewModel(
                                 true
                             }
                         }
+
+                        else -> {
+
+                        }
                     }
                 }
             }
+            localPlayer = localPlayerUpdate
             return lobbyMonitor
         } else {
             return null

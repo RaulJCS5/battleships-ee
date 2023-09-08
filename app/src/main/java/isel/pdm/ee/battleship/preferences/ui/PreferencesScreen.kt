@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -103,7 +103,7 @@ fun PreferencesScreen(
                     maxLines = 3,
                     label = { Text(stringResource(id = R.string.preferences_screen_moto_tip)) },
                     leadingIcon = {
-                        Icon(Icons.Default.Menu, contentDescription = "")
+                        Icon(Icons.Default.Info, contentDescription = "")
                     },
                     readOnly = !editing,
                     modifier = Modifier

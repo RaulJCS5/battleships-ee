@@ -27,7 +27,7 @@ class FakeLobby() : Lobby {
         check(state == Idle)
         try {
             list.add(localPlayer)
-            state = InUse(localPlayer)
+            state = InUse(localPlayer, null)
             return getPlayers()
         } catch (e: Throwable) {
             throw Exception()

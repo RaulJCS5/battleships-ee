@@ -24,7 +24,7 @@ class LobbyActivity : ComponentActivity() {
     private val viewModel by viewModels<LobbyScreenViewModel> {
         viewModelInit {
             val app = (application as DependenciesContainer)
-            LobbyScreenViewModel(app.lobby, app.userInfoRepo)
+            LobbyScreenViewModel(app.lobbyFirebase, app.userInfoRepo)
         }
     }
 

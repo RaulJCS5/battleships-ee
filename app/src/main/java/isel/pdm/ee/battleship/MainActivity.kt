@@ -1,8 +1,12 @@
 package isel.pdm.ee.battleship
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import isel.pdm.ee.battleship.lobby.LobbyActivity
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
 
