@@ -46,6 +46,7 @@ Figure 2. The user interacted with a UI element, causing an event to be triggere
 
 ![UI layer](mad-arch-overview-ui.png)
 Figure 3. The UI layer's role in app architecture.
+
 - The UI layer is made up of two things:
 
   - UI elements that render the data on the screen. You build these elements using Views or Jetpack Compose functions.
@@ -67,3 +68,21 @@ Figure 4. The domain layer's role in app architecture.
 - The domain layer is responsible for encapsulating complex business logic, or simple business logic that is reused by multiple ViewModels.
 
 # PDM LEIC51D 2223i - Aula 14
+
+ViewModel pede ao lobby, obtém e publica, ao publicar reativante a UI atualiza
+
+Flow<List<PlayerInfo>>
+O que acontece na linha temporal no lobby?
+
+Num dado instante à um determinado conjunto de players num instante t1 o conjunto de players que estão no lobby é outro.
+Flow -> A sequencia de snapshots ao longo do tempo
+
+MutableStateFlow -> peça que viabiliza a adaptação de uma realidade a outra, isto é de um Flow a um MutableState que é o estado observável para forçar a recomposição, quando alterado.
+
+collect-> para cada elemento do Flow publica no MutableStateFlow
+
+```kotlin
+lifecycleScope.launch{
+    repeatOnLifecycle(Lifecycle.State.STARTED)
+}
+```

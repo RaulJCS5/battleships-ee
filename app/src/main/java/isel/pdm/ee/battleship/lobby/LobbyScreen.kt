@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.pdm.ee.battleship.R
+import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import isel.pdm.ee.battleship.preferences.domain.UserInfo
 import isel.pdm.ee.battleship.ui.NavigationHandlers
 import isel.pdm.ee.battleship.ui.TopBar

@@ -56,9 +56,12 @@ fun PreferencesScreen(
             floatingActionButton = {
                 EditFab(
                     onClick =
-                        if (!editing) { { editing = true } }
-                        else if (enteredInfo == null) null
-                        else { { onSaveRequested(enteredInfo) } },
+                    if (!editing) {
+                        { editing = true }
+                    } else if (enteredInfo == null) null
+                    else {
+                        { onSaveRequested(enteredInfo) }
+                    },
                     mode = if (editing) FabMode.Add else FabMode.Edit
                 )
             }

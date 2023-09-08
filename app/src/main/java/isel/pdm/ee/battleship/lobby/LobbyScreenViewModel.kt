@@ -1,11 +1,13 @@
 package isel.pdm.ee.battleship.lobby
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import isel.pdm.ee.battleship.TAG
+import isel.pdm.ee.battleship.lobby.domain.Lobby
+import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
+import isel.pdm.ee.battleship.lobby.domain.PlayersInLobbyUpdate
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,26 +27,47 @@ class LobbyScreenViewModel(
 
     /**
      * Enters the lobby.
-     * collects the list of players in the lobby and updates the [_players] flow.
-     * if appears a new element in the list of players, it will be added to the [_players] flow.
-     * each time appears a new element in the list of players, it will be added to the [_players] flow.
-     * publishing in a MutableStateFlow will trigger a recomposition of the UI.
+     * create a coroutine that will monitor the lobby and update the list of players
+     * the flow terminates when the lobby is left
+     * when theres a change in the lobby, the list of players is updated
+     * the list of players is filtered to remove the local player
+     * @return the job that monitors the lobby
      */
-    fun enterLobby(){
-        if(lobbyMonitor == null) {
+    fun enterLobby(): Job? {
+        if (lobbyMonitor == null) {
             lobbyMonitor = viewModelScope.launch {
-                lobby.players.collect { players ->
-                    _players.value = players
-                    Log.v(TAG, "LobbyScreenViewModel: enterLobby: players: ${players.size}")
+                val localPlayer = PlayerInfo(checkNotNull(userInfoRepo.userInfo))
+                lobby.enterAndObserve(localPlayer).collect { event ->
+                    when (event) {
+                        is PlayersInLobbyUpdate -> {
+                            _players.value = event.players.filter {
+                                // TODO: For demonstration purposes, we want to see our own player in the list
+                                //it != localPlayer
+                                true
+                            }
+                        }
+                    }
                 }
             }
+            return lobbyMonitor
+        } else {
+            return null
         }
     }
+
     /**
      * Leaves the lobby.
      */
-    fun leaveLobby(){
-        lobbyMonitor?.cancel()
-        lobbyMonitor = null
+    fun leaveLobby(): Job? {
+        return if (lobbyMonitor != null) {
+            viewModelScope.launch {
+                lobbyMonitor?.cancel()
+                lobbyMonitor = null
+                lobby.leave()
+            }
+            lobbyMonitor
+        } else {
+            null
+        }
     }
 }

@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.lobby
+package isel.pdm.ee.battleship.lobby.domain
 
 import isel.pdm.ee.battleship.preferences.domain.UserInfo
 import java.util.*

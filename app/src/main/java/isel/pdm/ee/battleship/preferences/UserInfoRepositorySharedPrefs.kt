@@ -24,12 +24,12 @@ class UserInfoRepositorySharedPrefs(private val context: Context): UserInfoRepos
             else
                 null
         }
-    /**
-     * Suggests delimitation of a set of operations that are carried out as a whole or not
-     * edit() edit() change operations and at the end apply the changes made to this object in the store
-     * apply() vs commit()
-     * apply() to be main friendly needs to be asynchronous
-     * */
+        /**
+         * Suggests delimitation of a set of operations that are carried out as a whole or not
+         * edit() edit() change operations and at the end apply the changes made to this object in the store
+         * apply() vs commit()
+         * apply() to be main friendly needs to be asynchronous
+         * */
         set(value) {
             if (value == null)
                 prefs.edit()

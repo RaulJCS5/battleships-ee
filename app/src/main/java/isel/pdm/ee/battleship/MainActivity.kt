@@ -18,11 +18,11 @@ class MainActivity : ComponentActivity() {
             MainScreen(onStartRequested = ::startGame)
         }
     }
+
     private fun startGame() {
         if (repo.userInfo != null) {
             LobbyActivity.navigate(this)
-        }
-        else
+        } else
             PreferencesActivity.navigate(this)
     }
 }

@@ -2,7 +2,7 @@ package isel.pdm.ee.battleship
 
 import android.app.Application
 import isel.pdm.ee.battleship.lobby.FakeLobby
-import isel.pdm.ee.battleship.lobby.Lobby
+import isel.pdm.ee.battleship.lobby.domain.Lobby
 import isel.pdm.ee.battleship.preferences.UserInfoRepositorySharedPrefs
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 

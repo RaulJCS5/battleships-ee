@@ -44,19 +44,20 @@ class LobbyActivity : ComponentActivity() {
             val players by viewModel.players.collectAsState()
             LobbyScreen(
                 state = LobbyScreenState(players),
-                onPlayerSelected = {  },
+                onPlayerSelected = { },
                 onBackRequested = { finish() },
                 onPreferencesRequested = {
                     PreferencesActivity.navigate(this, finishOnSave = true)
                 }
             )
         }
-        lifecycle.addObserver(object : DefaultLifecycleObserver{
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 super.onStart(owner)
                 Log.v(TAG, "LobbyActivity::onStart")
                 viewModel.enterLobby()
             }
+
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
                 Log.v(TAG, "LobbyActivity::onStop")
