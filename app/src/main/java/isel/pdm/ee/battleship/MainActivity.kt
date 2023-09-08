@@ -3,44 +3,26 @@ package isel.pdm.ee.battleship
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
+import isel.pdm.ee.battleship.lobby.LobbyActivity
+import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
 
 class MainActivity : ComponentActivity() {
+
+    private val repo by lazy {
+        (application as DependenciesContainer).userInfoRepo
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            BattleshipTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("my name is RaulJCS5")
-                }
-            }
+            MainScreen(onStartRequested = ::startGame)
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BattleshipTheme {
-        Greeting("Android")
+    private fun startGame() {
+        if (repo.userInfo != null) {
+            LobbyActivity.navigate(this)
+        }
+        else
+            PreferencesActivity.navigate(this)
     }
 }
