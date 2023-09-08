@@ -20,7 +20,9 @@ class FakeLobby() : Lobby {
     override suspend fun getPlayers(): List<PlayerInfo> {
         return list
     }
-
+    /**
+     * The coroutine that calls this method will be suspended until the lobby is left or a player added to the lobby.
+     * */
     override suspend fun enter(localPlayer: PlayerInfo): List<PlayerInfo> {
         check(state == Idle)
         try {
@@ -31,7 +33,14 @@ class FakeLobby() : Lobby {
             throw Exception()
         }
     }
-
+    /**
+     *  Enter the lobby and observe the changes in the lobby.
+     *  callbackFlow is a builder function that creates a Flow whose lifecycle is controlled by the given ProducerScope.
+     *  It is a primitive that serves to adapt the reality of asynchronous APIs based on callbacks to the reality of asynchronous APIs based on suspending coroutines.
+     *  As? Giving programmatic access to continuation
+     *  When the callbackFlow is terminated, the collect is returned.
+     *  Consequently the writes in the collect flow are stopped.
+     * */
     override fun enterAndObserve(localPlayer: PlayerInfo): Flow<LobbyEvent> {
         check(state == Idle)
         return callbackFlow {
@@ -49,6 +58,11 @@ class FakeLobby() : Lobby {
         }
     }
 
+    /**
+     * If not inside the lobby, throws an exception.
+     * If InUse without flow, removes the local player from the lobby.
+     * If InUse with flow, closes the flow and removes the local player from the lobby.
+     * */
     override suspend fun leave() {
         when (val currentState = state) {
             is InUseWithFlow -> {
