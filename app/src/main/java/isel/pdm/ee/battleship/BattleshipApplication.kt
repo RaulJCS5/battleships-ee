@@ -28,6 +28,8 @@ interface DependenciesContainer {
  */
 class BattleshipApplication : DependenciesContainer, Application() {
 
+    // 10.0.2.2 is the special IP address to connect to the 'localhost' of
+    // the host computer from an Android emulator.
     private val emulatedFirestoreDb: FirebaseFirestore by lazy {
         Firebase.firestore.also {
             it.useEmulator("10.0.2.2", 8080)
@@ -46,7 +48,7 @@ class BattleshipApplication : DependenciesContainer, Application() {
         get() = FakeLobby()
 
     override val lobbyFirebase: Lobby
-        get() = LobbyFirebase(realFirestoreDb)
+        get() = LobbyFirebase(emulatedFirestoreDb)
 
 }
 
