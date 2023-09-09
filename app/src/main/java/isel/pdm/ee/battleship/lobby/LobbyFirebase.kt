@@ -1,6 +1,7 @@
 package isel.pdm.ee.battleship.lobby
 
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QueryDocumentSnapshot
@@ -11,6 +12,8 @@ import isel.pdm.ee.battleship.lobby.domain.InUseWithFlow
 import isel.pdm.ee.battleship.lobby.domain.Lobby
 import isel.pdm.ee.battleship.lobby.domain.LobbyEvent
 import isel.pdm.ee.battleship.lobby.domain.LobbyState
+import isel.pdm.ee.battleship.lobby.domain.Matching
+import isel.pdm.ee.battleship.lobby.domain.MatchingReceived
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import isel.pdm.ee.battleship.lobby.domain.PlayersInLobbyUpdate
 import isel.pdm.ee.battleship.preferences.domain.UserInfo
@@ -23,8 +26,10 @@ import java.util.UUID
 
 
 const val LOBBY = "lobby"
+const val MATCHING = "matching"
 const val NICK_FIELD = "nick"
 const val MOTO_FIELD = "moto"
+const val MATCHING_ID = "id"
 
 class LobbyFirebase(private val db: FirebaseFirestore) : Lobby {
     private var state: LobbyState = Idle
@@ -74,17 +79,55 @@ class LobbyFirebase(private val db: FirebaseFirestore) : Lobby {
             state = InUseWithFlow(localPlayer, scope = this)
             var myDocRef: DocumentReference? = null
             var playersObserve: ListenerRegistration? = null
+            var matchingObserve: ListenerRegistration? = null
             try {
                 myDocRef = addLocalPlayer(localPlayer) // adds the local player to the lobby
                 playersObserve = playersObserveUpdated(flow = this)
+                matchingObserve = matchingObserveUpdated(myDocRef, flow = this)
             } catch (e: Exception) {
                 close(e)
             }
             awaitClose { // guarantees that the local player is removed from the lobby
                 playersObserve?.remove()
+                matchingObserve?.remove()
                 myDocRef?.delete()
             }
         }
+    }
+
+    private fun matchingObserveUpdated(
+        myDocRef: DocumentReference,
+        flow: ProducerScope<LobbyEvent>
+    ): ListenerRegistration {
+        return myDocRef.addSnapshotListener(){
+            snapshot, error ->
+            when {
+                error != null -> flow.close(error)
+                snapshot != null -> {
+                    val matching: Matching? = snapshot.toMatchingOrNull()
+                    if (matching != null) {
+                        flow.trySend(MatchingReceived(matching))
+                    }
+                }
+            }
+        }
+    }
+
+    override suspend fun createMatching(to: PlayerInfo): Matching {
+        val localPlayer = when (val currentState = state) {
+            is Idle -> throw java.lang.IllegalStateException()
+            is InUse -> currentState.localPlayer
+            is InUseWithFlow -> currentState.localPlayer
+        }
+        db.collection(LOBBY)
+            .document(localPlayer.id.toString())
+            .update(MATCHING, to.toDocumentContent())
+            .await()
+        db.collection(LOBBY)
+            .document(to.id.toString())
+            .update(MATCHING, localPlayer.toDocumentContent())
+            .await()
+        return Matching(player1 = localPlayer, player2 = to)
     }
 
     private suspend fun addLocalPlayer(localPlayer: PlayerInfo): DocumentReference {
@@ -103,6 +146,44 @@ class LobbyFirebase(private val db: FirebaseFirestore) : Lobby {
             }
         }
 }
+
+private fun DocumentSnapshot.toMatchingOrNull(): Matching? {
+    val docData = data
+    if (docData != null) {
+        val matching = docData[MATCHING] as Map<*, *>?
+        if (matching != null) {
+            return Matching(
+                player1 = PlayerInfo(
+                    info = UserInfo(
+                        nick = matching[NICK_FIELD] as String,
+                        moto = matching[MOTO_FIELD] as String?
+                    ),
+                    id = UUID.fromString(
+                        matching[MATCHING_ID] as String
+                    )
+                ),
+                player2 = PlayerInfo(
+                    info = UserInfo(
+                        nick = this[NICK_FIELD] as String,
+                        moto = this[MOTO_FIELD] as String?
+                    ),
+                    id = UUID.fromString(this.id)
+                )
+            )
+        }
+    }
+    return null
+}
+
+/**
+ * [PlayerInfo] extension function used to convert an instance to a map of key-value
+ * pairs containing the object's properties
+ */
+fun PlayerInfo.toDocumentContent() = mapOf(
+    NICK_FIELD to info.nick,
+    MOTO_FIELD to info.moto,
+    MATCHING_ID to id.toString()
+)
 
 fun QueryDocumentSnapshot.toPlayerInfo() =
     PlayerInfo(

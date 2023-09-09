@@ -8,3 +8,4 @@ package isel.pdm.ee.battleship.lobby.domain
 sealed class LobbyEvent
 data class PlayersInLobbyUpdate(val players: List<PlayerInfo>) : LobbyEvent()
 
+data class MatchingReceived(val matching: Matching) : LobbyEvent()

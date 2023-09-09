@@ -3,18 +3,19 @@ package isel.pdm.ee.battleship.lobby
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import isel.pdm.ee.battleship.DependenciesContainer
-import isel.pdm.ee.battleship.TAG
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
 import isel.pdm.ee.battleship.utils.viewModelInit
+import kotlinx.coroutines.launch
 
 /**
  * The screen used to display the list of players in the lobby, that is, available to play.
@@ -39,31 +40,37 @@ class LobbyActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.enterLobby()
         setContent {
             val players by viewModel.players.collectAsState()
             LobbyScreen(
                 state = LobbyScreenState(players),
-                onPlayerSelected = { },
+                onPlayerSelected = { player -> viewModel.sendMatching(player) },
                 onBackRequested = { finish() },
                 onPreferencesRequested = {
                     PreferencesActivity.navigate(this, finishOnSave = true)
                 }
             )
         }
-        lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) {
-                super.onStart(owner)
-                Log.v(TAG, "LobbyActivity::onStart")
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.enterLobby()
+                try {
+                    viewModel.pendingMatching.collect {
+                        if (it != null) {
+                            Toast.makeText(
+                                this@LobbyActivity,
+                                "Matching with player1 ${it.matching.player1} and player2 ${it.matching.player2} localPlayer ${it.localPlayer}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                finally {
+                    viewModel.leaveLobby()
+                }
             }
+        }
 
-            override fun onStop(owner: LifecycleOwner) {
-                super.onStop(owner)
-                Log.v(TAG, "LobbyActivity::onStop")
-                viewModel.leaveLobby()
-            }
-        })
     }
 
 }

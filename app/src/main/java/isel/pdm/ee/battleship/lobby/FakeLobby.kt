@@ -58,6 +58,10 @@ class FakeLobby() : Lobby {
         }
     }
 
+    override suspend fun createMatching(to: PlayerInfo): Matching {
+        TODO("Not yet implemented")
+    }
+
     /**
      * If not inside the lobby, throws an exception.
      * If InUse without flow, removes the local player from the lobby.

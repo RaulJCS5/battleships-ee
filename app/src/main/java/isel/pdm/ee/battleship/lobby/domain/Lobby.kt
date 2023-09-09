@@ -33,4 +33,5 @@ interface Lobby {
      * @throws IllegalStateException    if the lobby was already entered
      */
     fun enterAndObserve(localPlayer: PlayerInfo): Flow<LobbyEvent>
+    suspend fun createMatching(to: PlayerInfo): Matching
 }

@@ -3,8 +3,12 @@ package isel.pdm.ee.battleship.lobby
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import isel.pdm.ee.battleship.lobby.domain.Lobby
+import isel.pdm.ee.battleship.lobby.domain.MatchingReceived
+import isel.pdm.ee.battleship.lobby.domain.PendingMatching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import isel.pdm.ee.battleship.lobby.domain.PlayersInLobbyUpdate
+import isel.pdm.ee.battleship.lobby.domain.SentMatching
+import isel.pdm.ee.battleship.lobby.domain.StartMatching
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +25,9 @@ class LobbyScreenViewModel(
 
     private val _players = MutableStateFlow<List<PlayerInfo>>(emptyList())
     val players = _players.asStateFlow()
+
+    private val _pendingMatching = MutableStateFlow<PendingMatching?>(null)
+    val pendingMatching = _pendingMatching.asStateFlow()
 
     private var lobbyMonitor: Job? = null
     private var localPlayer: PlayerInfo? = null
@@ -41,14 +48,14 @@ class LobbyScreenViewModel(
                     when (event) {
                         is PlayersInLobbyUpdate -> {
                             _players.value = event.players.filter {
-                                // TODO: For demonstration purposes, we want to see our own player in the list
-                                //it != localPlayer
-                                true
+                                it != localPlayer
                             }
                         }
-
-                        else -> {
-
+                        is MatchingReceived -> {
+                            _pendingMatching.value = StartMatching(
+                                localPlayer = localPlayerUpdate,
+                                matching = event.matching
+                            )
                         }
                     }
                 }
@@ -68,9 +75,26 @@ class LobbyScreenViewModel(
             viewModelScope.launch {
                 lobbyMonitor?.cancel()
                 lobbyMonitor = null
+                _pendingMatching.value = null
                 lobby.leave()
             }
             lobbyMonitor
+        } else {
+            null
+        }
+    }
+
+    fun sendMatching(opponent: PlayerInfo): Job? {
+        val currentMonitor = lobbyMonitor
+        val currentLocalPlayer = localPlayer
+        return if (currentMonitor != null && currentLocalPlayer != null) {
+            viewModelScope.launch {
+                val createMatching = lobby.createMatching(to=opponent)
+                _pendingMatching.value = SentMatching(
+                    localPlayer = currentLocalPlayer,
+                    matching = createMatching
+                )
+            }
         } else {
             null
         }
