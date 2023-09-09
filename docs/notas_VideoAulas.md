@@ -86,3 +86,17 @@ lifecycleScope.launch{
     repeatOnLifecycle(Lifecycle.State.STARTED)
 }
 ```
+
+# PDM LEIC52D/LEIRT51D 2223i - Aula 16
+
+Quando for para apagar fazer back para forçar a eliminação da collection lobby, porque terminar à bruta equivale a um crash e um crash não tem cleanup.
+
+- Exemplo
+  - Player 1 está a ver o Player 2 e vice-versa
+  - O Player 1 altera o seu Moto e guarda
+  - O Player 1 vê o Player 2
+  - O Player 2 vê o Player 1, mas não consegue ver a alteração que foi feita no Player 1, ou seja, não atualiza.
+Razão: Porque o viewModel vê o repositório quando foi instanciado
+
+# PDM LEIC52D/LEIRT51D 2223i - Aula 17
+
