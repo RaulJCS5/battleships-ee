@@ -120,10 +120,6 @@ class LobbyFirebase(private val db: FirebaseFirestore) : Lobby {
             is InUseWithFlow -> currentState.localPlayer
         }
         db.collection(LOBBY)
-            .document(localPlayer.id.toString())
-            .update(MATCHING, to.toDocumentContent())
-            .await()
-        db.collection(LOBBY)
             .document(to.id.toString())
             .update(MATCHING, localPlayer.toDocumentContent())
             .await()
