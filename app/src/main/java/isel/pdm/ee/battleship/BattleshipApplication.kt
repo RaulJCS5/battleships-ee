@@ -5,6 +5,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import isel.pdm.ee.battleship.game.Match
+import isel.pdm.ee.battleship.game.MatchFirebase
 import isel.pdm.ee.battleship.lobby.FakeLobby
 import isel.pdm.ee.battleship.lobby.LobbyFirebase
 import isel.pdm.ee.battleship.lobby.domain.Lobby
@@ -21,6 +23,7 @@ interface DependenciesContainer {
     val userInfoRepo: UserInfoRepository
     val fakeLobby: Lobby
     val lobbyFirebase: Lobby
+    val match: Match
 }
 
 /**
@@ -50,5 +53,7 @@ class BattleshipApplication : DependenciesContainer, Application() {
     override val lobbyFirebase: Lobby
         get() = LobbyFirebase(emulatedFirestoreDb)
 
+    override val match: Match
+        get() = MatchFirebase(emulatedFirestoreDb)
 }
 

@@ -4,6 +4,8 @@
 
 [Connect your app to the Cloud Firestore Emulator](https://firebase.google.com/docs/emulator-suite/connect_firestore)
 
+[Firebase list of prjects](https://console.firebase.google.com/)
+
 - [firebase-tools](https://github.com/firebase/firebase-tools)
 
  firebase login

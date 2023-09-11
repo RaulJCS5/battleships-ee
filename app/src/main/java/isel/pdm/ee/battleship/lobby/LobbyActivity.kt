@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import isel.pdm.ee.battleship.DependenciesContainer
+import isel.pdm.ee.battleship.game.GameActivity
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
 import isel.pdm.ee.battleship.utils.viewModelInit
 import kotlinx.coroutines.launch
@@ -57,11 +58,10 @@ class LobbyActivity : ComponentActivity() {
                 try {
                     viewModel.pendingMatching.collect {
                         if (it != null) {
-                            Toast.makeText(
-                                this@LobbyActivity,
-                                "Matching with player1 ${it.matching.player1} and player2 ${it.matching.player2} localPlayer ${it.localPlayer}",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this@LobbyActivity, "Match found!", Toast.LENGTH_SHORT).show()
+                            GameActivity.navigate(
+                                origin = this@LobbyActivity
+                            )
                         }
                     }
                 }
