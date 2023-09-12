@@ -56,7 +56,7 @@ fun LobbyScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(id = R.string.lobby_screen_title),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(16.dp))

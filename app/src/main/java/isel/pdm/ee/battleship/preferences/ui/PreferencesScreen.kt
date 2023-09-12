@@ -75,7 +75,7 @@ fun PreferencesScreen(
             ) {
                 Text(
                     text = stringResource(id = R.string.preferences_screen_title),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.height(50.dp))
@@ -85,7 +85,10 @@ fun PreferencesScreen(
                     onValueChange = { displayedNick = ensureInputBounds(it) },
                     singleLine = true,
                     label = {
-                        Text(stringResource(id = R.string.preferences_screen_nickname_tip))
+                        Text(
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            text = stringResource(id = R.string.preferences_screen_nickname_tip))
                     },
                     leadingIcon = {
                         Icon(Icons.Default.Face, contentDescription = "")
@@ -97,11 +100,15 @@ fun PreferencesScreen(
                         .testTag(NicknameInputTag)
                         .semantics { if (!editing) this[IsReadOnly] = Unit }
                 )
+                Spacer(modifier = Modifier.height(20.dp))
                 OutlinedTextField(
                     value = displayedMoto,
                     onValueChange = { displayedMoto = ensureInputBounds(it) },
                     maxLines = 3,
-                    label = { Text(stringResource(id = R.string.preferences_screen_moto_tip)) },
+                    label = { Text(
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        text = stringResource(id = R.string.preferences_screen_moto_tip)) },
                     leadingIcon = {
                         Icon(Icons.Default.Info, contentDescription = "")
                     },

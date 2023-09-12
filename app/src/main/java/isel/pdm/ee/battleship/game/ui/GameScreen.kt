@@ -59,7 +59,7 @@ fun GameScreen(
                 }
                 Text(
                     text = stringResource(id = titleTextId),
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.displayMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.testTag(GameScreenTitleTag)
                 )
@@ -76,7 +76,10 @@ fun GameScreen(
                     onClick = onForfeitRequested,
                     modifier = Modifier.testTag(ForfeitButtonTag)
                 ) {
-                    Text(text = stringResource(id = R.string.game_screen_forfeit))
+                    Text(
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.background,
+                        text = stringResource(id = R.string.game_screen_forfeit))
                 }
                 Spacer(modifier = Modifier.height(32.dp))
             }

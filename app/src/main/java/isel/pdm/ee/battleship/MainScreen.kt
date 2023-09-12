@@ -33,7 +33,7 @@ fun MainScreen(onStartRequested: () -> Unit = { }) {
             ) {
                 Text(
                     text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.displayLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.primary
                 )

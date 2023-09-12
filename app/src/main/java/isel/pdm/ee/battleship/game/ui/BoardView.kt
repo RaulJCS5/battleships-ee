@@ -13,10 +13,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.game.BOARD_SIDE
 import isel.pdm.ee.battleship.game.Board
 import isel.pdm.ee.battleship.game.Coordinate
+import isel.pdm.ee.battleship.game.Game
 
 @Composable
 fun BoardView(
@@ -54,8 +57,8 @@ fun BoardView(
 private fun HorizontalSeparator() {
     Spacer(modifier = Modifier
         .fillMaxWidth()
-        .height(8.dp)
-        .background(MaterialTheme.colorScheme.secondary)
+        .height(4.dp)
+        .background(MaterialTheme.colorScheme.background)
     )
 }
 
@@ -63,7 +66,14 @@ private fun HorizontalSeparator() {
 private fun VerticalSeparator() {
     Spacer(modifier = Modifier
         .fillMaxHeight()
-        .width(8.dp)
-        .background(MaterialTheme.colorScheme.secondary)
+        .width(4.dp)
+        .background(MaterialTheme.colorScheme.background)
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BoardViewPreview() {
+    val game = Game()
+    BoardView(board = game.board, onTileSelected = { }, enabled = true)
 }
