@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.game
+package isel.pdm.ee.battleship.game.domain
 
 enum class ShipType(val size: Int, name: String) {
     CARRIER(5, "CARRIER"),

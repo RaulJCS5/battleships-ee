@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.lobby
+package isel.pdm.ee.battleship.lobby.ui
 
 import android.content.Context
 import android.content.Intent
@@ -13,7 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import isel.pdm.ee.battleship.DependenciesContainer
-import isel.pdm.ee.battleship.game.GameActivity
+import isel.pdm.ee.battleship.game.ui.GameActivity
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
 import isel.pdm.ee.battleship.utils.viewModelInit
 import kotlinx.coroutines.launch

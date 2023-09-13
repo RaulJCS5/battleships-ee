@@ -15,11 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import isel.pdm.ee.battleship.R
-import isel.pdm.ee.battleship.game.BOARD_SIDE
-import isel.pdm.ee.battleship.game.Board
-import isel.pdm.ee.battleship.game.Coordinate
-import isel.pdm.ee.battleship.game.Game
+import isel.pdm.ee.battleship.game.domain.BOARD_SIDE
+import isel.pdm.ee.battleship.game.domain.Board
+import isel.pdm.ee.battleship.game.domain.Coordinate
+import isel.pdm.ee.battleship.game.domain.Game
 
 @Composable
 fun BoardView(

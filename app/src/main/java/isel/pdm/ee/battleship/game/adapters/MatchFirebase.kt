@@ -1,6 +1,12 @@
-package isel.pdm.ee.battleship.game
+package isel.pdm.ee.battleship.game.adapters
 
 import com.google.firebase.firestore.FirebaseFirestore
+import isel.pdm.ee.battleship.game.domain.Coordinate
+import isel.pdm.ee.battleship.game.domain.Game
+import isel.pdm.ee.battleship.game.domain.GameEvent
+import isel.pdm.ee.battleship.game.domain.GameStarted
+import isel.pdm.ee.battleship.game.domain.Match
+import isel.pdm.ee.battleship.game.domain.makeMove
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import kotlinx.coroutines.channels.awaitClose

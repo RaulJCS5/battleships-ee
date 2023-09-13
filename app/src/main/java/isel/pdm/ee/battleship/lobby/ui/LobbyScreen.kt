@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.lobby
+package isel.pdm.ee.battleship.lobby.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

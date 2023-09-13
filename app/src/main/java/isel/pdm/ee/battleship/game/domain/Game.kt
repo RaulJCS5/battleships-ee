@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.game
+package isel.pdm.ee.battleship.game.domain
 
 data class Game(
     val localPlayerMarker: PlayerMarker = PlayerMarker.firstToMove,

@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.game
+package isel.pdm.ee.battleship.game.domain
 
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo

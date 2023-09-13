@@ -14,8 +14,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.pdm.ee.battleship.R
-import isel.pdm.ee.battleship.game.Coordinate
-import isel.pdm.ee.battleship.game.Game
+import isel.pdm.ee.battleship.game.domain.Coordinate
+import isel.pdm.ee.battleship.game.domain.Game
 import isel.pdm.ee.battleship.ui.TopBar
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
 

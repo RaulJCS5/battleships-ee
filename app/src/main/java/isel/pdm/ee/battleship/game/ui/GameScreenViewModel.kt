@@ -1,10 +1,13 @@
-package isel.pdm.ee.battleship.game
+package isel.pdm.ee.battleship.game.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import isel.pdm.ee.battleship.game.domain.Coordinate
+import isel.pdm.ee.battleship.game.domain.Game
+import isel.pdm.ee.battleship.game.domain.Match
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

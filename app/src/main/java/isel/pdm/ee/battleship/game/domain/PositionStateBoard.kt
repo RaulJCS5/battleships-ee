@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.game
+package isel.pdm.ee.battleship.game.domain
 
 data class PositionStateBoard(
     val boardPosition: Coordinate,

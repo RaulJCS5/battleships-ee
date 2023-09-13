@@ -5,10 +5,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import isel.pdm.ee.battleship.game.Match
-import isel.pdm.ee.battleship.game.MatchFirebase
-import isel.pdm.ee.battleship.lobby.FakeLobby
-import isel.pdm.ee.battleship.lobby.LobbyFirebase
+import isel.pdm.ee.battleship.game.adapters.MatchFirebase
+import isel.pdm.ee.battleship.game.domain.Match
+import isel.pdm.ee.battleship.lobby.adapters.FakeLobby
+import isel.pdm.ee.battleship.lobby.adapters.LobbyFirebase
 import isel.pdm.ee.battleship.lobby.domain.Lobby
 import isel.pdm.ee.battleship.preferences.UserInfoRepositorySharedPrefs
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository

@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.lobby
+package isel.pdm.ee.battleship.lobby.adapters
 
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot

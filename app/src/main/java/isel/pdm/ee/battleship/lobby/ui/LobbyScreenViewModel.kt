@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.lobby
+package isel.pdm.ee.battleship.lobby.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

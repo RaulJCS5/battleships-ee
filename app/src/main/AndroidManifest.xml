@@ -29,11 +29,11 @@
             android:windowSoftInputMode="adjustPan">
         </activity>
         <activity
-            android:name=".lobby.LobbyActivity"
+            android:name=".lobby.ui.LobbyActivity"
             android:exported="false">
         </activity>
         <activity
-            android:name=".game.GameActivity"
+            android:name=".game.ui.GameActivity"
             android:exported="false">
         </activity>
     </application>

@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.game
+package isel.pdm.ee.battleship.game.ui
 
 import android.content.Context
 import android.content.Intent
@@ -10,8 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import isel.pdm.ee.battleship.DependenciesContainer
 import isel.pdm.ee.battleship.R
-import isel.pdm.ee.battleship.game.ui.GameScreen
-import isel.pdm.ee.battleship.game.ui.GameScreenState
 
 import isel.pdm.ee.battleship.utils.viewModelInit
 
