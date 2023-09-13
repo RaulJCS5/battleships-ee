@@ -9,7 +9,11 @@ import androidx.lifecycle.viewModelScope
 import isel.pdm.ee.battleship.TAG
 import isel.pdm.ee.battleship.game.domain.Coordinate
 import isel.pdm.ee.battleship.game.domain.Game
+import isel.pdm.ee.battleship.game.domain.GameEnded
+import isel.pdm.ee.battleship.game.domain.GameStarted
 import isel.pdm.ee.battleship.game.domain.Match
+import isel.pdm.ee.battleship.game.domain.OnGoing
+import isel.pdm.ee.battleship.game.domain.getResult
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import kotlinx.coroutines.Job
@@ -54,12 +58,35 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
             Log.v(TAG, "startMatch: $state")
             _state = MatchState.STARTING
             viewModelScope.launch {
-                match.start(localPlayer, matching)
-                _state = MatchState.STARTED
+                match.start(localPlayer, matching).collect {
+                    _onGoingGame.value = it.game
+                    _state = when (it) {
+                        is GameStarted -> {
+                            Log.v(TAG, "GameStarted 1")
+                            MatchState.STARTED
+                        }
+                        is GameEnded -> {
+                            Log.v(TAG, "GameEnded 1")
+                            MatchState.FINISHED
+                        }
+                        else ->
+                            if (it.game.getResult() !is OnGoing) {
+                                Log.v(TAG, "GameEnded 2")
+                                MatchState.FINISHED
+                            }
+                            else {
+                                Log.v(TAG, "GameStarted 2")
+                                MatchState.STARTED
+                            }
+                    }
+                    if (_state == MatchState.FINISHED)
+                        match.end()
+                }
             }
         }
         else {
             Log.v(TAG, "startMatch: $state")
+            null
         }
     }
 }
