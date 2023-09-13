@@ -60,7 +60,9 @@ class LobbyActivity : ComponentActivity() {
                         if (it != null) {
                             Toast.makeText(this@LobbyActivity, "Match found!", Toast.LENGTH_SHORT).show()
                             GameActivity.navigate(
-                                origin = this@LobbyActivity
+                                origin = this@LobbyActivity,
+                                localPlayer = it.localPlayer,
+                                matching = it.matching
                             )
                         }
                     }

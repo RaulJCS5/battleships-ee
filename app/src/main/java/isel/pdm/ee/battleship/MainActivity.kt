@@ -1,6 +1,7 @@
 package isel.pdm.ee.battleship
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import isel.pdm.ee.battleship.lobby.ui.LobbyActivity

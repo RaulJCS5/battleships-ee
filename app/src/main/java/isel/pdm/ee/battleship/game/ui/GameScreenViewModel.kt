@@ -1,13 +1,17 @@
 package isel.pdm.ee.battleship.game.ui
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import isel.pdm.ee.battleship.TAG
 import isel.pdm.ee.battleship.game.domain.Coordinate
 import isel.pdm.ee.battleship.game.domain.Game
 import isel.pdm.ee.battleship.game.domain.Match
+import isel.pdm.ee.battleship.lobby.domain.Matching
+import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,10 +35,32 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                 match.makeMove(at)
             }
         }
-        else null
+        else {
+            Log.v(TAG, "No move")
+            null
+        }
 
     fun forfeit(): Job? =
-        if (state == MatchState.STARTED) viewModelScope.launch { match.forfeit() }
-        else null
+        if (state == MatchState.STARTED) viewModelScope.launch {
+            match.forfeit()
+        }
+        else {
+            Log.v(TAG, "No forfeit")
+            null
+        }
+
+    fun startMatch(localPlayer: PlayerInfo, matching: Matching) {
+        if (state == MatchState.IDLE) {
+            Log.v(TAG, "startMatch: $state")
+            _state = MatchState.STARTING
+            viewModelScope.launch {
+                match.start(localPlayer, matching)
+                _state = MatchState.STARTED
+            }
+        }
+        else {
+            Log.v(TAG, "startMatch: $state")
+        }
+    }
 }
 

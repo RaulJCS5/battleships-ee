@@ -7,8 +7,9 @@
     <string name="preferences_screen_moto_tip">Your moto</string>
     <string name="start_game_button_text">Play</string>
     <string name="lobby_screen_title">Available players</string>
-    <string name="game_screen_waiting">Joining match</string>
+    <string name="game_screen_starting">Starting</string>
     <string name="game_screen_your_turn">It\'s your turn</string>
     <string name="game_screen_opponent_turn">Opponent\'s turn</string>
     <string name="game_screen_forfeit">Forfeit</string>
+    <string name="game_screen_idle">Idle</string>
 </resources>

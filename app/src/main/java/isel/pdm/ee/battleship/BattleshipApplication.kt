@@ -14,7 +14,7 @@ import isel.pdm.ee.battleship.preferences.UserInfoRepositorySharedPrefs
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 
 
-const val TAG = "BattleshipApp"
+const val TAG = "BattleshipTAG"
 
 /**
  * The contract for the object that holds all the globally relevant dependencies.
