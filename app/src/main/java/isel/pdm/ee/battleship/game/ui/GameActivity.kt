@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
@@ -43,6 +44,10 @@ class GameActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            // This currentGame goes to the viewModel and says Im interested in the currentGame and I want to know when it changes
+            // because Im using Flow and MutableStateFlow
+            // Flow for progression until the ViewModel
+            // MutableStateFlow for the recomposition in the UI when the state changes
             val currentGame by viewModel.onGoingGame.collectAsState()
             val currentState = viewModel.state
             val title = when (currentState) {
@@ -58,6 +63,10 @@ class GameActivity: ComponentActivity() {
         }
         if (viewModel.state == MatchState.IDLE) {
             viewModel.startMatch(localPlayer, matching)
+        }
+        onBackPressedDispatcher.addCallback {
+            //viewModel.forfeit()
+            finish()
         }
     }
     private val matchInfoParcelable: MatchInfoParcelable by lazy {
@@ -76,10 +85,11 @@ class GameActivity: ComponentActivity() {
             id = UUID.fromString(matchInfoParcelable.opponentId),
             info = UserInfo(matchInfoParcelable.opponentNick)
         )
-        Matching(
-            player1 = localPlayer,
-            player2 = opponent,
-        )
+        if (localPlayer.id.toString()== matchInfoParcelable.matchingId) {
+            Matching(localPlayer, opponent)
+        } else {
+            Matching(opponent, localPlayer)
+        }
     }
 
 }

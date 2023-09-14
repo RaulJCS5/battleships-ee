@@ -1,6 +1,8 @@
 package isel.pdm.ee.battleship.game.domain
 
 
+const val BOARD_FIELD= "board"
+const val TURN_FIELD = "turn"
 data class Board(
     val turn: PlayerMarker = PlayerMarker.firstToMove,
     val tiles: MutableList<MutableList<PositionStateBoard>> =
@@ -40,7 +42,57 @@ data class Board(
             }.toMutableList()
         )
     }
+
     fun toMovesList(): MutableList<PositionStateBoard?> = tiles.flatten().toMutableList()
+    fun toDocumentContent() = mapOf(
+        TURN_FIELD to turn.name,
+        BOARD_FIELD to toMovesList().joinToString(separator = "") {
+            when {
+                it?.wasShoot == true && it.wasShip == true -> "X"
+                it?.wasShoot == true && it.wasShip == false -> "O"
+                else -> "-"
+            }
+        }
+    )
+
+    companion object {
+        fun fromMovesList(valueOf: PlayerMarker, moves: String): Board {
+            return Board(
+                turn = valueOf,
+                tiles = MutableList(
+                    size = BOARD_SIDE,
+                    init = { row ->
+                        MutableList(size = BOARD_SIDE, init = { col ->
+                            when (moves[row * BOARD_SIDE + col]) {
+                                'X' -> PositionStateBoard(
+                                    boardPosition = Coordinate(row, col),
+                                    wasShoot = true,
+                                    wasShip = true,
+                                    shipType = null,
+                                    shipLayout = null
+                                )
+
+                                'O' -> PositionStateBoard(
+                                    boardPosition = Coordinate(row, col),
+                                    wasShoot = true,
+                                    wasShip = false,
+                                    shipType = null,
+                                    shipLayout = null
+                                )
+
+                                else -> PositionStateBoard(
+                                    boardPosition = Coordinate(row, col),
+                                    wasShoot = false,
+                                    wasShip = false,
+                                    shipType = null,
+                                    shipLayout = null
+                                )
+                            }
+                        })
+                    })
+            )
+        }
+    }
 }
 
 fun isTied(): Boolean = false

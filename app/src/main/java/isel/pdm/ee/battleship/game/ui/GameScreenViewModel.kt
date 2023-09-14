@@ -58,7 +58,13 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
             Log.v(TAG, "startMatch: $state")
             _state = MatchState.STARTING
             viewModelScope.launch {
-                match.start(localPlayer, matching).collect {
+                // match.startAndObserveGameEvents(localPlayer, matching) subscription moment "I WANT"
+                // This executes because I enter the match and I throw a koroutine to start the game
+                // .collect{  } moment "HOW TO REACT"
+                // This executes because a element arrived to the flow and I want to react to it
+                // This runs as many times as things are pushed to the flow
+                // This is the moment where I say what to do with the element that arrived from the Flow
+                match.startAndObserveGameEvents(localPlayer, matching).collect {
                     _onGoingGame.value = it.game
                     _state = when (it) {
                         is GameStarted -> {

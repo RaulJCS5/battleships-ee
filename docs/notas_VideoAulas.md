@@ -98,5 +98,71 @@ Quando for para apagar fazer back para forçar a eliminação da collection lobb
   - O Player 2 vê o Player 1, mas não consegue ver a alteração que foi feita no Player 1, ou seja, não atualiza.
 Razão: Porque o viewModel vê o repositório quando foi instanciado
 
-# PDM LEIC52D/LEIRT51D 2223i - Aula 17
+# PDM LEIC51D 2223i - Aula 17
+
+Abordagem em subscrição clássica
+
+```mermaid
+graph RL
+
+  A((Server)) <--> B(SDK)
+  B --> C(Lobby)
+  B --v1--> C
+  B --v2--> C
+  B --vn--> C
+  C --Subscription Im interested--> B
+  D --Subscrição--> C
+  C --enter\nneste Flow representa todos os estados do lobby,\nisto é todas as composições do lobby\nenquanto estive lá dentro--> D(ViewModel)
+  C --elements pushed--> D
+  C --elements pushed--> D
+ 
+  D --Este é um StateFlow\nrepresenta a ultima observação feita--> E(UI)
+
+
+```
+
+When something happen is:
+```kotlin
+db.collection(LOBBY).addSnapshotListener{
+  snapshot, error ->
+    when {
+      error != null -> {
+        close(error)
+        }
+      snapshot != null -> {
+        // Do something
+        }
+    }
+}
+```
+O que é que este código diz: Olha é na API firestore quando houver alteração no ResultSet(conjunto de documentos que estão no Lobby), quando isso mudar executa o código __when{}__
+
+O que é o Flow é algo que representa a sequência temporal
+
+Este é o objeto que representa a sequência de acontecimentos
+
+Estado do lobby ao longo do tempo
+
+Flow<Any> -> retorna algo que representa a evolução temporal do estado do Any ao longo do tempo vai mudando
+
+No ViewModel entra e pega naquele Flow __(.collect)__ "eu quero fazer coisas com isso"
+
+```kotlin
+match.startAndObserveGameEvents(localPlayer, matching).collect { 
+
+  }
+```
+
+- __match.startAndObserveGameEvents(localPlayer, matching)__
+  - __"I WANT"__
+  - Momento de subscrição
+  -Isto é vou entrar, neste caso entrar num __match__, e lança uma koroutine para começar o __match__
+
+- __.collect__
+  - __"HOW TO REACT"__
+  - É uma abstração que significa o que é que eu quero fazer quando chegar um novo elemento, e enquanto eu estiver no __.collect__ estou sensivel, estou a reagir a chagadas de elementos, se o __.collect__ retornar acabou-se já não estou a reagir.
+
+---
+# Processo de subscrição, receção multipla e reação
+---
 

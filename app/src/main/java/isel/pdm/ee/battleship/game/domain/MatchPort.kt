@@ -12,7 +12,7 @@ class GameEnded(game: Game, val winner: PlayerMarker? = null) : GameEvent(game)
 
 interface Match {
 
-    fun start(localPlayer: PlayerInfo, matching: Matching): Flow<GameEvent>
+    fun startAndObserveGameEvents(localPlayer: PlayerInfo, matching: Matching): Flow<GameEvent>
     suspend fun forfeit()
     suspend fun end()
     suspend fun makeMove(at: Coordinate)
