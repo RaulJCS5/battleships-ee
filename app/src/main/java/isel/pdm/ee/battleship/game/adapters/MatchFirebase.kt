@@ -48,7 +48,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                 localPlayerMarker = getPlayerMarker(localPlayer, matching),
                 board = Board()
                 )
-            val gameId = matching.player1.id.toString() + matching.player2.id.toString()
+            val gameId = matching.player1.id.toString()
             var gameSubscription: ListenerRegistration? = null
             try {
                 if (localPlayer == matching.player2) {
@@ -59,7 +59,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                     gameId = gameId,
                     producerScope = this
                 )
-                //trySend(GameStarted(game)).isSuccess
+
             } catch (e: Exception) {
                 Log.v(TAG, "start callbackFlow exception")
                 close(e)
@@ -95,9 +95,9 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                     // This snapshot contains the data of the document
                     snapshot != null -> {
                         val snapshotData = snapshot.data
-                        Log.v(TAG, "snapshotData $snapshotData")
                         // This snapshot contains the data of the document
                         if (snapshotData != null) {
+                            Log.v(TAG, "snapshotWithData $snapshotData")
                             val board = snapshotData[BOARD_FIELD] as String
                             val turn = snapshotData[TURN_FIELD] as String
                             val playerMarkerTurn = PlayerMarker.valueOf(turn)
@@ -123,8 +123,11 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                                     MoveMade(game)
                                 }
                             }
-                            onGoingGame = Pair(game, "Not defined")
+                            onGoingGame = Pair(game, gameId )
                             producerScope.trySend(gameEvent)
+                        }
+                        else {
+                            Log.v(TAG, "snapshotWithoutData $snapshotData")
                         }
                     }
                 }
@@ -153,22 +156,34 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     }
 
     override suspend fun makeMove(at: Coordinate) {
-        checkNotNull(onGoingGame)
-        Log.v(TAG, "makeMove")
-        /*onGoingGame = checkNotNull(onGoingGame).also {
+        onGoingGame = checkNotNull(onGoingGame).also {
+            Log.v(TAG, "makeMove")
             val game = it.copy(first = it.first.makeMove(at))
+            Log.v(TAG, "makeMove game $game")
             updateGame(game.first, game.second)
-        }*/
+        }
     }
 
-    private fun updateGame(game: Game, gameId: String) {
-        Log.v(TAG, "updateGame")
-        db.collection(ONGOING)
-            .document(gameId)
-            .update(game.board.toDocumentContent())
-            .addOnSuccessListener { Log.v(TAG, "updateGame addOnSuccessListener") }
-            .addOnFailureListener { Log.v(TAG, "updateGame addOnFailureListener") }
+    private suspend fun updateGame(game: Game, gameId: String) {
+        try {
+            Log.v(TAG, "updateGame $gameId")
+            db.collection(ONGOING)
+                .document(gameId)
+                .update(game.board.toDocumentContent())
+                .addOnSuccessListener { Log.v(TAG, "updateGame addOnSuccessListener") }
+                .addOnFailureListener { e ->
+                    Log.e(
+                        TAG,
+                        "updateGame addOnFailureListener: ${e.message}",
+                        e
+                    )
+                }
+                .await()
+        } catch (e: Exception) {
+            Log.e(TAG, "updateGame Exception: ${e.message}", e)
+        }
     }
+
 
     override suspend fun forfeit() {
         checkNotNull(onGoingGame)
