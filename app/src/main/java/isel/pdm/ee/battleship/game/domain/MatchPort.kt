@@ -11,7 +11,6 @@ class MoveMade(game: Game) : GameEvent(game)
 class GameEnded(game: Game, val winner: PlayerMarker? = null) : GameEvent(game)
 
 sealed class TimeEvent(val time: Int)
-class TimeStarted(time: Int) : TimeEvent(time)
 class TimeUpdated(time: Int) : TimeEvent(time)
 class TimeEnded(time: Int) : TimeEvent(time)
 

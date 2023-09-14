@@ -14,7 +14,6 @@ import isel.pdm.ee.battleship.game.domain.GameStarted
 import isel.pdm.ee.battleship.game.domain.Match
 import isel.pdm.ee.battleship.game.domain.OnGoing
 import isel.pdm.ee.battleship.game.domain.TimeEnded
-import isel.pdm.ee.battleship.game.domain.TimeStarted
 import isel.pdm.ee.battleship.game.domain.TimeUpdated
 import isel.pdm.ee.battleship.game.domain.getResult
 import isel.pdm.ee.battleship.lobby.domain.Matching
@@ -38,11 +37,13 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
     val state: MatchState
         get() = _state
 
+    private var timerJob: Job? = null
 
     fun makeMove(at: Coordinate): Job? =
         if (state == MatchState.STARTED) {
             viewModelScope.launch {
                 match.makeMove(at)
+                stopTimer()
             }
         }
         else {
@@ -54,6 +55,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
         if (state == MatchState.STARTED)
             viewModelScope.launch {
                 match.quitGame()
+                stopTimer()
             }
         else {
             Log.v(TAG, "No quit game")
@@ -105,13 +107,9 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
 
     fun startTimer() {
         if (state == MatchState.STARTED) {
-            viewModelScope.launch {
+            timerJob = viewModelScope.launch {
                 match.startTimer(_remainingTime.value).collect {
                     when(it) {
-                        is TimeStarted -> {
-                            Log.v(TAG, "TimeStarted")
-                            _remainingTime.value = it.time
-                        }
                         is TimeEnded -> {
                             match.quitGame()
                         }
@@ -124,6 +122,19 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
         }
         else {
             Log.v(TAG, "No start timer")
+        }
+    }
+
+    private fun stopTimer() {
+        if (timerJob == null) {
+            Log.v(TAG, "No timer to stop")
+            return
+        }
+        else {
+            _remainingTime.value = 1
+            timerJob?.cancel()
+            timerJob = null
+            Log.v(TAG, "Timer stopped")
         }
     }
 }

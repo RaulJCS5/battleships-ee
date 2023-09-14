@@ -36,7 +36,6 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     private val QUIT_GAME_FIELD: String = "quitgame"
     private val ONGOING: String = "ongoing"
     private var onGoingGame: Pair<Game, String>? = null
-    private var onGoingTimeEvent: Pair<Int, String>? = null
     /**
      * This function is called when the game is started and is responsible for subscribing to the game state updates.
      * @param localPlayer the local player
@@ -179,7 +178,6 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
 
     override fun startTimer(time:Int): Flow<TimeEvent> {
         return callbackFlow {
-            val timeSubscription: ListenerRegistration? = null
             try {
                 delay(1000)
                 val timer = time +1
@@ -194,12 +192,11 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                     trySend(timeEvent)
                 }
             } catch (e: Exception) {
-                Log.v(TAG, "startTimer callbackFlow exception")
+                Log.v(TAG, "startTimer callbackFlow exception $e")
                 close(e)
             }
             awaitClose {
                 Log.v(TAG, "startTimer callbackFlow awaitClose")
-                timeSubscription?.remove()
             }
         }
     }
@@ -225,7 +222,9 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         }
     }
 
-
+    /**
+     * This function is called when the player quits the game
+     */
     override suspend fun quitGame() {
         onGoingGame = checkNotNull(onGoingGame).also {
             db.collection(ONGOING)
@@ -238,7 +237,6 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * This function is called when the game is ended
      */
     override suspend fun end() {
-        // fake implementation
         check(onGoingGame != null)
         Log.v(TAG, "end")
         db.collection(ONGOING).document(onGoingGame!!.second).delete().await()
