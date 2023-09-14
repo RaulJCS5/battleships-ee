@@ -13,6 +13,9 @@ import isel.pdm.ee.battleship.game.domain.GameEnded
 import isel.pdm.ee.battleship.game.domain.GameStarted
 import isel.pdm.ee.battleship.game.domain.Match
 import isel.pdm.ee.battleship.game.domain.OnGoing
+import isel.pdm.ee.battleship.game.domain.TimeEnded
+import isel.pdm.ee.battleship.game.domain.TimeStarted
+import isel.pdm.ee.battleship.game.domain.TimeUpdated
 import isel.pdm.ee.battleship.game.domain.getResult
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
@@ -27,6 +30,9 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
 
     private val _onGoingGame = MutableStateFlow(Game())
     val onGoingGame = _onGoingGame.asStateFlow()
+
+    private val _remainingTime = MutableStateFlow(1)
+    val remainingTime = _remainingTime.asStateFlow()
 
     private var _state by mutableStateOf(MatchState.IDLE)
     val state: MatchState
@@ -94,6 +100,30 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
         else {
             Log.v(TAG, "startMatch: $state")
             null
+        }
+    }
+
+    fun startTimer() {
+        if (state == MatchState.STARTED) {
+            viewModelScope.launch {
+                match.startTimer(_remainingTime.value).collect {
+                    when(it) {
+                        is TimeStarted -> {
+                            Log.v(TAG, "TimeStarted")
+                            _remainingTime.value = it.time
+                        }
+                        is TimeEnded -> {
+                            match.quitGame()
+                        }
+                        is TimeUpdated -> {
+                            _remainingTime.value = it.time
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            Log.v(TAG, "No start timer")
         }
     }
 }

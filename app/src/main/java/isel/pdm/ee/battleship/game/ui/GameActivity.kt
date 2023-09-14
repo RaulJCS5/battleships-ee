@@ -48,6 +48,7 @@ class GameActivity: ComponentActivity() {
             // Flow for progression until the ViewModel
             // MutableStateFlow for the recomposition in the UI when the state changes
             val currentGame by viewModel.onGoingGame.collectAsState()
+            val remainingTime by viewModel.remainingTime.collectAsState()
             val currentState = viewModel.state
             val title = when (currentState) {
                 MatchState.STARTING -> R.string.game_screen_starting
@@ -57,8 +58,12 @@ class GameActivity: ComponentActivity() {
             GameScreen(
                 state = GameScreenState(title, currentGame),
                 onMoveRequested = { at -> viewModel.makeMove(at) },
-                onQuitGameRequested = { viewModel.quitGame() }
+                onQuitGameRequested = { viewModel.quitGame() },
+                remainingTime = remainingTime
             )
+            if (currentGame.localPlayerMarker == currentGame.board.turn) {
+                viewModel.startTimer()
+            }
         }
         if (viewModel.state == MatchState.IDLE) {
             viewModel.startMatch(localPlayer, matching)

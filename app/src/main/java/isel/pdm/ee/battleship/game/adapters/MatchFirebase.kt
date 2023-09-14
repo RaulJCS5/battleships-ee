@@ -15,11 +15,15 @@ import isel.pdm.ee.battleship.game.domain.Match
 import isel.pdm.ee.battleship.game.domain.MoveMade
 import isel.pdm.ee.battleship.game.domain.PlayerMarker
 import isel.pdm.ee.battleship.game.domain.TURN_FIELD
+import isel.pdm.ee.battleship.game.domain.TimeEnded
+import isel.pdm.ee.battleship.game.domain.TimeEvent
+import isel.pdm.ee.battleship.game.domain.TimeUpdated
 import isel.pdm.ee.battleship.game.domain.makeMove
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
@@ -32,7 +36,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     private val QUIT_GAME_FIELD: String = "quitgame"
     private val ONGOING: String = "ongoing"
     private var onGoingGame: Pair<Game, String>? = null
-
+    private var onGoingTimeEvent: Pair<Int, String>? = null
     /**
      * This function is called when the game is started and is responsible for subscribing to the game state updates.
      * @param localPlayer the local player
@@ -172,6 +176,34 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
             updateGame(game.first, game.second)
         }
     }
+
+    override fun startTimer(time:Int): Flow<TimeEvent> {
+        return callbackFlow {
+            val timeSubscription: ListenerRegistration? = null
+            try {
+                delay(1000)
+                val timer = time +1
+                if (timer==10){
+                    Log.v(TAG, "TimeEnded $timer")
+                    val timeEvent = TimeEnded(timer)
+                    trySend(timeEvent)
+                }
+                else{
+                    Log.v(TAG, "TimeUpdated $timer")
+                    val timeEvent = TimeUpdated(timer)
+                    trySend(timeEvent)
+                }
+            } catch (e: Exception) {
+                Log.v(TAG, "startTimer callbackFlow exception")
+                close(e)
+            }
+            awaitClose {
+                Log.v(TAG, "startTimer callbackFlow awaitClose")
+                timeSubscription?.remove()
+            }
+        }
+    }
+
 
     private suspend fun updateGame(game: Game, gameId: String) {
         try {
