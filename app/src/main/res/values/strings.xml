@@ -12,4 +12,5 @@
     <string name="game_screen_opponent_turn">Opponent\'s turn</string>
     <string name="game_screen_quit_game">Quit game</string>
     <string name="game_screen_idle">Idle</string>
+    <string name="remaining_time">Remaining time</string>
 </resources>
