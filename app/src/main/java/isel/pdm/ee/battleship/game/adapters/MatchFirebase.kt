@@ -1,7 +1,6 @@
 package isel.pdm.ee.battleship.game.adapters
 
 import android.util.Log
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import isel.pdm.ee.battleship.TAG
@@ -30,6 +29,7 @@ import kotlinx.coroutines.tasks.await
  */
 class MatchFirebase(private val db: FirebaseFirestore) : Match {
 
+    private val QUIT_GAME_FIELD: String = "quitgame"
     private val ONGOING: String = "ongoing"
     private var onGoingGame: Pair<Game, String>? = null
 
@@ -100,23 +100,32 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                             Log.v(TAG, "snapshotWithData $snapshotData")
                             val board = snapshotData[BOARD_FIELD] as String
                             val turn = snapshotData[TURN_FIELD] as String
+                            val quitGamePlayer = snapshotData[QUIT_GAME_FIELD] as String?
                             val playerMarkerTurn = PlayerMarker.valueOf(turn)
                             val realBoard = Board.fromMovesList(
                                 valueOf = playerMarkerTurn,
                                 moves = board
                             )
+                            Log.v(TAG, "turn $turn quitGame $quitGamePlayer")
+                            val pairGameQuitGame = if (quitGamePlayer != null) {
+                                val playerMarkerQuitGame = PlayerMarker.valueOf(quitGamePlayer)
+                                Pair(realBoard, playerMarkerQuitGame)
+                            } else {
+                                Pair(realBoard, null)
+                            }
                             val game = Game(
                                 localPlayerMarker = localPlayerMarker,
-                                board = realBoard
+                                quitGameBy = pairGameQuitGame.second,
+                                board = pairGameQuitGame.first
                             )
                             val gameEvent = when {
                                 onGoingGame == null -> {
                                     Log.v(TAG, "GameStarted")
                                     GameStarted(game)
                                 }
-                                game.forfeitedBy != null -> {
+                                game.quitGameBy != null -> {
                                     Log.v(TAG, "GameEnded")
-                                    GameEnded(game, game.forfeitedBy.other)
+                                    GameEnded(game, game.quitGameBy.other)
                                 }
                                 else -> {
                                     Log.v(TAG, "MoveMade")
@@ -185,9 +194,13 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     }
 
 
-    override suspend fun forfeit() {
-        checkNotNull(onGoingGame)
-        Log.v(TAG, "forfeit")
+    override suspend fun quitGame() {
+        onGoingGame = checkNotNull(onGoingGame).also {
+            db.collection(ONGOING)
+                .document(it.second)
+                .update(QUIT_GAME_FIELD, it.first.localPlayerMarker)
+                .await()
+        }
     }
     /**
      * This function is called when the game is ended

@@ -30,7 +30,7 @@ fun TileView(
             .background(marker)
             .fillMaxSize(1.0f)
             .padding(4.dp)
-            .clickable(enabled = !move.wasShoot) { onSelected() }
+            .clickable(enabled = !move.wasShoot && enabled) { onSelected() }
         ) {
         }
     }

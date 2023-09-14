@@ -21,7 +21,7 @@ import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
 
 internal const val GameScreenTag = "GameScreen"
 internal const val GameScreenTitleTag = "GameScreenTitle"
-internal const val ForfeitButtonTag = "ForfeitButton"
+internal const val QuitGameButtonTag = "QuitGameButton"
 
 data class GameScreenState(
     @StringRes val title: Int?,
@@ -33,7 +33,7 @@ data class GameScreenState(
 fun GameScreen(
     state: GameScreenState,
     onMoveRequested: (Coordinate) -> Unit = { },
-    onForfeitRequested: () -> Unit = { },
+    onQuitGameRequested: () -> Unit = { },
 ) {
     BattleshipTheme {
         Scaffold(
@@ -73,13 +73,13 @@ fun GameScreen(
                         .fillMaxSize()
                 )
                 Button(
-                    onClick = onForfeitRequested,
-                    modifier = Modifier.testTag(ForfeitButtonTag)
+                    onClick = onQuitGameRequested,
+                    modifier = Modifier.testTag(QuitGameButtonTag)
                 ) {
                     Text(
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.background,
-                        text = stringResource(id = R.string.game_screen_forfeit))
+                        text = stringResource(id = R.string.game_screen_quit_game))
                 }
                 Spacer(modifier = Modifier.height(32.dp))
             }

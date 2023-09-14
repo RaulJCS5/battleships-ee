@@ -2,7 +2,6 @@ package isel.pdm.ee.battleship.game.ui
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
@@ -58,14 +57,14 @@ class GameActivity: ComponentActivity() {
             GameScreen(
                 state = GameScreenState(title, currentGame),
                 onMoveRequested = { at -> viewModel.makeMove(at) },
-                onForfeitRequested = { viewModel.forfeit() }
+                onQuitGameRequested = { viewModel.quitGame() }
             )
         }
         if (viewModel.state == MatchState.IDLE) {
             viewModel.startMatch(localPlayer, matching)
         }
         onBackPressedDispatcher.addCallback {
-            //viewModel.forfeit()
+            viewModel.quitGame()
             finish()
         }
     }

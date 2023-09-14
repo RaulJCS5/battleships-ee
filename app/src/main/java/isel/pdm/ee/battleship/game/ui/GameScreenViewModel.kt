@@ -44,12 +44,13 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
             null
         }
 
-    fun forfeit(): Job? =
-        if (state == MatchState.STARTED) viewModelScope.launch {
-            match.forfeit()
-        }
+    fun quitGame(): Job? =
+        if (state == MatchState.STARTED)
+            viewModelScope.launch {
+                match.quitGame()
+            }
         else {
-            Log.v(TAG, "No forfeit")
+            Log.v(TAG, "No quit game")
             null
         }
 

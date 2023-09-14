@@ -10,6 +10,6 @@
     <string name="game_screen_starting">Starting</string>
     <string name="game_screen_your_turn">It\'s your turn</string>
     <string name="game_screen_opponent_turn">Opponent\'s turn</string>
-    <string name="game_screen_forfeit">Forfeit</string>
+    <string name="game_screen_quit_game">Quit game</string>
     <string name="game_screen_idle">Idle</string>
 </resources>
