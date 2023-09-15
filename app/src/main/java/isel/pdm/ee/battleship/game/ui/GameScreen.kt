@@ -43,7 +43,9 @@ fun GameScreen(
                 .fillMaxSize()
                 .testTag(GameScreenTag),
             topBar = {
-                TopBar()
+                TopBar(
+                    navigationId = R.string.app_name
+                )
             },
         ) { innerPadding ->
             Column(
@@ -66,12 +68,20 @@ fun GameScreen(
                     modifier = Modifier.testTag(GameScreenTitleTag)
                 )
                 Spacer(modifier = Modifier.height(32.dp))
-                Text(
-                    text = "${stringResource(id = R.string.remaining_time)} ${remainingTime + 1}",
-                    style = MaterialTheme.typography.displaySmall, // Customize the style as needed
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.testTag(GameScreenTimerTag)
-                )
+                Row {
+                    Text(
+                        text = "${stringResource(id = R.string.chronometer_timer)} ",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.testTag(GameScreenTimerTag)
+                    )
+                    Text(
+                        text = String.format("%02d:%02d", remainingTime / 60, remainingTime % 60),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.testTag(GameScreenTimerTag)
+                    )
+                }
                 BoardView(
                     board = state.game.board,
                     onTileSelected = onMoveRequested,

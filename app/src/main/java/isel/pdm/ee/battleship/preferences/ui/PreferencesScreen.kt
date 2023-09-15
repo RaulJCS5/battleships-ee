@@ -52,7 +52,10 @@ fun PreferencesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .testTag(PreferencesScreenTag),
-            topBar = { TopBar(NavigationHandlers(onBackRequested)) },
+            topBar = {
+                TopBar(NavigationHandlers(onBackRequested),
+                    navigationId = R.string.app_name
+                ) },
             floatingActionButton = {
                 EditFab(
                     onClick =

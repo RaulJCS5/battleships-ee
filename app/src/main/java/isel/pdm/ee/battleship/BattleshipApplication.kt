@@ -12,6 +12,8 @@ import isel.pdm.ee.battleship.lobby.adapters.LobbyFirebase
 import isel.pdm.ee.battleship.lobby.domain.Lobby
 import isel.pdm.ee.battleship.preferences.UserInfoRepositorySharedPrefs
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
+import isel.pdm.ee.battleship.users.player.IPlayerService
+import isel.pdm.ee.battleship.users.player.PlayerService
 
 
 const val TAG = "BattleshipTAG"
@@ -20,6 +22,7 @@ const val TAG = "BattleshipTAG"
  * The contract for the object that holds all the globally relevant dependencies.
  */
 interface DependenciesContainer {
+    val playerService: IPlayerService
     val userInfoRepo: UserInfoRepository
     val fakeLobby: Lobby
     val lobbyFirebase: Lobby
@@ -43,6 +46,9 @@ class BattleshipApplication : DependenciesContainer, Application() {
     }
     private val realFirestoreDb: FirebaseFirestore by lazy {
         Firebase.firestore
+    }
+    override val playerService: IPlayerService by lazy {
+        PlayerService()
     }
     override val userInfoRepo: UserInfoRepository
         get() = UserInfoRepositorySharedPrefs(this)

@@ -42,7 +42,8 @@ fun LobbyScreen(
                 .testTag(LobbyScreenTag),
             topBar = {
                 TopBar(
-                    NavigationHandlers(onBackRequested, onPreferencesRequested)
+                    NavigationHandlers(onBackRequested, onPreferencesRequested),
+                    R.string.app_name
                 )
             },
         ) { innerPadding ->

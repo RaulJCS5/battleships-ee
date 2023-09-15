@@ -15,12 +15,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
+import isel.pdm.ee.battleship.utils.NavigateMainAuthorButtonTestTag
+import isel.pdm.ee.battleship.utils.NavigateMainLeaderboardButtonTestTag
 
 const val MainScreenTag = "MainScreen"
 const val PlayButtonTag = "PlayButton"
 
 @Composable
-fun MainScreen(onStartRequested: () -> Unit = { }) {
+fun MainScreen(
+    onStartRequested: () -> Unit = { },
+    onLeaderBoardRequested: (() -> Unit)? = null,
+    onAuthorRequested: (() -> Unit)? = null,
+) {
     BattleshipTheme {
         Surface(
             modifier = Modifier
@@ -47,6 +53,30 @@ fun MainScreen(onStartRequested: () -> Unit = { }) {
                         text = stringResource(id = R.string.start_game_button_text)
                     )
                 }
+                if (onLeaderBoardRequested != null) {
+                    Button(
+                        onClick = onLeaderBoardRequested,
+                        modifier = Modifier.testTag(NavigateMainLeaderboardButtonTestTag)
+                    ) {
+                        Text(
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.background,
+                            text = stringResource(id = R.string.app_leaderboard_screen_button),
+                        )
+                    }
+                }
+                if (onAuthorRequested != null) {
+                    Button(
+                        onClick = onAuthorRequested,
+                        modifier = Modifier.testTag(NavigateMainAuthorButtonTestTag)
+                    ) {
+                        Text(
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.background,
+                            text = stringResource(id = R.string.app_author_screen_button),
+                        )
+                    }
+                }
             }
         }
     }
@@ -55,5 +85,9 @@ fun MainScreen(onStartRequested: () -> Unit = { }) {
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
+    MainScreen(
+        onStartRequested = { },
+        onLeaderBoardRequested = { },
+        onAuthorRequested = { }
+    )
 }

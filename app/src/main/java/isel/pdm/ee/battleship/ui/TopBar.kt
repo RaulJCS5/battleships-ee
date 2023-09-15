@@ -15,6 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
+import isel.pdm.ee.battleship.utils.NavigateBackTag
+import isel.pdm.ee.battleship.utils.NavigateToHomeTestTag
+import isel.pdm.ee.battleship.utils.NavigateToPreferencesTag
 
 /**
  * Used to aggregate [TopBar] navigation handlers.
@@ -22,20 +25,19 @@ import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
 data class NavigationHandlers(
     val onBackRequested: (() -> Unit)? = null,
     val onPreferencesRequested: (() -> Unit)? = null,
-)
-
-// Test tags for the TopBar navigation elements
-const val NavigateBackTag = "NavigateBack"
-const val NavigateToPreferencesTag = "NavigateToPreferences"
+    )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navigation: NavigationHandlers = NavigationHandlers()) {
+fun TopBar(
+    navigation: NavigationHandlers = NavigationHandlers(),
+    navigationId: Int
+) {
     TopAppBar(
         title = { Text(
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.primary,
-            text = stringResource(id = R.string.app_name)) },
+            text = stringResource(id = navigationId)) },
         navigationIcon = {
             if (navigation.onBackRequested != null) {
                 IconButton(
@@ -69,7 +71,8 @@ fun TopBar(navigation: NavigationHandlers = NavigationHandlers()) {
 private fun TopBarPreviewBack() {
     BattleshipTheme {
         TopBar(
-            NavigationHandlers(onBackRequested = { })
+            NavigationHandlers(onBackRequested = { }),
+            R.string.app_name
         )
     }
 }
@@ -79,7 +82,8 @@ private fun TopBarPreviewBack() {
 private fun TopBarPreviewBackAndPrefs() {
     BattleshipTheme {
         TopBar(
-            NavigationHandlers(onBackRequested = { }, onPreferencesRequested = { })
+            NavigationHandlers(onBackRequested = { }, onPreferencesRequested = { }),
+            R.string.app_name
         )
     }
 }
@@ -88,7 +92,10 @@ private fun TopBarPreviewBackAndPrefs() {
 @Composable
 private fun TopBarPreviewNoNavigation() {
     BattleshipTheme {
-        TopBar()
+        TopBar(
+            NavigationHandlers(),
+            R.string.app_name
+        )
     }
 }
 

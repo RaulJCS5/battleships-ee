@@ -12,7 +12,7 @@
     <string name="game_screen_opponent_turn">Opponent\'s turn</string>
     <string name="game_screen_quit_game">Quit game</string>
     <string name="game_screen_idle">Idle</string>
-    <string name="remaining_time">Remaining time</string>
+    <string name="chronometer_timer">Chronometer: </string>
     <string name="match_ended_dialog_text_tied_match">The match is tied</string>
     <string name="match_ended_dialog_text_local_won">Congratulations, you won!</string>
     <string name="match_ended_dialog_text_opponent_won">Yout opponent has won</string>
@@ -21,4 +21,23 @@
     <string name="starting_match_cancel_button">Cancel</string>
     <string name="starting_match_dialog_title">Match is starting</string>
     <string name="starting_match_dialog_text">Waiting for opponent to join</string>
+    <string name="app_author_screen_title">Presenting author</string>
+    <string name="activity_info_no_suitable_app">Could not find a suitable application</string>
+    <string name="top_bar_go_home">Go to home</string>
+    <string name="app_user_id_label">User id:</string>
+    <string name="app_username_label">UserName:</string>
+    <string name="app_email_label">Email:</string>
+    <string name="app_ranking_played_games_label">Played games:</string>
+    <string name="app_ranking_win_games_label">Win games:</string>
+    <string name="app_ranking_lost_games_label">Lost games:</string>
+    <string name="app_authors_screen_title">Presenting authors</string>
+    <string name="app_api_title_error">Fatal error get data</string>
+    <string name="app_api_label_error">Game not available!</string>
+    <string name="app_join_lobby_screen_button">Join lobby</string>
+    <string name="app_player_home">User Home</string>
+    <string name="fetch_button_text_loading">Loading</string>
+    <string name="app_players_list_screen_title">List of players</string>
+    <string name="app_find_players_screen_button">Find players</string>
+    <string name="app_author_screen_button">Author</string>
+    <string name="app_leaderboard_screen_button">Leaderboard</string>
 </resources>

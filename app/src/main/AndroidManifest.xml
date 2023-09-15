@@ -36,6 +36,29 @@
             android:name=".game.ui.GameActivity"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".users.ranking.RakingListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".users.author.AuthorActivity"
+            android:exported="false"
+            android:label="@string/app_author_screen_title"
+            >
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".users.listAuthors.AuthorsListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".users.player.PlayerActivity"
+            android:exported="false"
+            >
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
     </application>
 
 </manifest>
