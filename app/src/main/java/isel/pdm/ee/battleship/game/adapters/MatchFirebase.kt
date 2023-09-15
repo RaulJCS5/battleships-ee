@@ -4,9 +4,11 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import isel.pdm.ee.battleship.TAG
+import isel.pdm.ee.battleship.TAG_MODEL
 import isel.pdm.ee.battleship.game.domain.BOARD_FIELD
 import isel.pdm.ee.battleship.game.domain.Board
 import isel.pdm.ee.battleship.game.domain.Coordinate
+import isel.pdm.ee.battleship.game.domain.FLEET_FIELD
 import isel.pdm.ee.battleship.game.domain.Game
 import isel.pdm.ee.battleship.game.domain.GameEnded
 import isel.pdm.ee.battleship.game.domain.GameEvent
@@ -33,6 +35,8 @@ import kotlinx.coroutines.tasks.await
  */
 class MatchFirebase(private val db: FirebaseFirestore) : Match {
 
+    private val PLAYER1: String = "player1"
+    private val PLAYER2: String = "player2"
     private val QUIT_GAME_FIELD: String = "quitgame"
     private val ONGOING: String = "ongoing"
     private var onGoingGame: Pair<Game, String>? = null
@@ -85,10 +89,11 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         gameId: String,
         producerScope: ProducerScope<GameEvent>
     ): ListenerRegistration {
-        return db.collection(ONGOING)
-            .document(gameId)
+        val ongoingCollection = db.collection(ONGOING).document(gameId)
+        val playerMarkerCollection =
+            ongoingCollection.collection(localPlayerMarker.name.lowercase())
+        val listenerRegistration = playerMarkerCollection.document(BOARD_FIELD)
             .addSnapshotListener { snapshot, error ->
-                Log.v(TAG, "subscribeGameStateUpdated addSnapshotListener")
                 when {
                     // When theres an error we close the producerScope
                     error != null -> {
@@ -103,11 +108,17 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                             Log.v(TAG, "snapshotWithData $snapshotData")
                             val board = snapshotData[BOARD_FIELD] as String
                             val turn = snapshotData[TURN_FIELD] as String
+                            val fleet = snapshotData[FLEET_FIELD] as String
                             val quitGamePlayer = snapshotData[QUIT_GAME_FIELD] as String?
+                            Log.v(TAG_MODEL, "snapshotWithData $board")
+                            Log.v(TAG_MODEL, "snapshotWithData $turn")
+                            Log.v(TAG_MODEL, "snapshotWithData $fleet")
+                            Log.v(TAG_MODEL, "snapshotWithData $quitGamePlayer")
                             val playerMarkerTurn = PlayerMarker.valueOf(turn)
                             val realBoard = Board.fromMovesList(
                                 valueOf = playerMarkerTurn,
-                                moves = board
+                                moves = board,
+                                fleet = fleet
                             )
                             Log.v(TAG, "turn $turn quitGame $quitGamePlayer")
                             val pairGameQuitGame = if (quitGamePlayer != null) {
@@ -144,6 +155,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                     }
                 }
             }
+        return listenerRegistration
     }
     /**
      * This function is called when the game is started
@@ -151,10 +163,19 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * @param gameId the id of the game
      */
     private suspend fun postGameStarted(game: Game, gameId: String) {
-        db.collection(ONGOING)
-            .document(gameId)
-            .set(game.board.toDocumentContent())
-            .await()
+        // Define Firestore paths
+        val gameDocRef = db.collection(ONGOING).document(gameId)
+        val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
+        val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
+
+        try {
+            player1BoardRef.set(game.board.toDocumentContent()).await()
+            player2BoardRef.set(game.board.toDocumentContent()).await()
+            println("Game state saved to Firestore successfully.")
+        } catch (e: Exception) {
+            // Handle any errors that may occur during the Firestore operation
+            println("Error saving game state to Firestore: $e")
+        }
     }
 
     /**
@@ -168,12 +189,12 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     }
 
     override suspend fun makeMove(at: Coordinate) {
-        onGoingGame = checkNotNull(onGoingGame).also {
+        /*onGoingGame = checkNotNull(onGoingGame).also {
             Log.v(TAG, "makeMove")
             val game = it.copy(first = it.first.makeMove(at))
             Log.v(TAG, "makeMove game $game")
             updateGame(game.first, game.second)
-        }
+        }*/
     }
 
     override fun startTimer(time: Int, timeLimit: Int): Flow<TimeEvent> {
@@ -181,7 +202,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
             try {
                 delay(1000)
                 val timer = time +1
-                if (timer==timeLimit){
+                if (timer>=timeLimit){
                     Log.v(TAG, "TimeEnded $timer")
                     val timeEvent = TimeEnded(timer)
                     trySend(timeEvent)
@@ -226,12 +247,12 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * This function is called when the player quits the game
      */
     override suspend fun quitGame() {
-        onGoingGame = checkNotNull(onGoingGame).also {
+        /*onGoingGame = checkNotNull(onGoingGame).also {
             db.collection(ONGOING)
                 .document(it.second)
                 .update(QUIT_GAME_FIELD, it.first.localPlayerMarker)
                 .await()
-        }
+        }*/
     }
     /**
      * This function is called when the game is ended

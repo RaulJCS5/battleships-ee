@@ -17,6 +17,7 @@ import isel.pdm.ee.battleship.users.player.adapters.PlayerService
 
 
 const val TAG = "BattleshipTAG"
+const val TAG_MODEL = "BattleshipMODEL"
 
 /**
  * The contract for the object that holds all the globally relevant dependencies.

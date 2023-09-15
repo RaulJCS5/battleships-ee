@@ -27,7 +27,7 @@ enum class MatchState { IDLE, STARTING, STARTED, FINISHED }
 
 class GameScreenViewModel(private val match: Match) : ViewModel() {
 
-    val timeLimit: Int = 120 // 2 minutes / 120 seconds
+    val timeLimit: Int = 12 // 2 minutes / 120 seconds
 
     private val _onGoingGame = MutableStateFlow(Game())
     val onGoingGame = _onGoingGame.asStateFlow()
@@ -114,7 +114,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                     when(it) {
                         is TimeEnded -> {
                             match.quitGame()
-                            _remainingTime.value = it.time
+                            _remainingTime.value = timeLimit
                         }
                         is TimeUpdated -> {
                             _remainingTime.value = it.time
