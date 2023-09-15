@@ -11,4 +11,6 @@ fun Game.makeMove(at: Coordinate): Game {
     return copy(board = board.makeMove(at))
 }
 
-fun Game.getResult():BoardResult = OnGoing()
+fun Game.getResult() =
+    if (quitGameBy != null) HasWinner(quitGameBy.other)
+    else board.getResult()

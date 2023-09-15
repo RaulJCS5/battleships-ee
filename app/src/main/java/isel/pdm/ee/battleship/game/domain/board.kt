@@ -224,10 +224,10 @@ class HasWinner(val winner: PlayerMarker) : BoardResult()
 class Tied : BoardResult()
 class OnGoing : BoardResult()
 
-fun Board.getResult(): BoardResult =
-    when {
+fun Board.getResult(): BoardResult = OnGoing()
+    /*when {
         hasWon(PlayerMarker.PLAYER1) -> HasWinner(PlayerMarker.PLAYER1)
         hasWon(PlayerMarker.PLAYER2) -> HasWinner(PlayerMarker.PLAYER2)
         toMovesList().all { it != null } -> Tied()
         else -> OnGoing()
-    }
+    }*/

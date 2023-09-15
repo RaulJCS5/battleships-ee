@@ -67,26 +67,14 @@ class GameActivity: ComponentActivity() {
                 remainingTime = remainingTime,
                 timeLimit = timeLimit
             )
-            when(currentState){
-                MatchState.FINISHED -> {
-                    if (currentGame.quitGameBy != null) {
-                        MatchEndedDialog(
-                            localPLayerMarker = currentGame.localPlayerMarker,
-                            result = HasWinner(currentGame.quitGameBy!!.other),
-                            onDismissRequested = { finish() }
-                        )
-                        Log.v(TAG, "This player quit the game ${currentGame.quitGameBy}")
-                    } else {
-                        MatchEndedDialog(
-                            localPLayerMarker = currentGame.localPlayerMarker,
-                            result = currentGame.getResult(),
-                            onDismissRequested = { finish() }
-                        )
-                        Log.v(TAG, "Game finished")
-                    }
-                }
-                else -> {
-                }
+            when (currentState) {
+                //MatchState.STARTING -> StartingMatchDialog()
+                MatchState.FINISHED -> MatchEndedDialog(
+                    localPLayerMarker = currentGame.localPlayerMarker,
+                    result = currentGame.getResult(),
+                    onDismissRequested = { finish() }
+                )
+                else -> { }
             }
             if (currentGame.localPlayerMarker == currentGame.board.turn) {
                 viewModel.startTimer()

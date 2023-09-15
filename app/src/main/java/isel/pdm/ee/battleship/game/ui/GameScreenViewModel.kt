@@ -120,6 +120,9 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                         is TimeUpdated -> {
                             _remainingTime.value = it.time
                         }
+                        else -> {
+                            Log.v(TAG, "No time")
+                        }
                     }
                 }
             }
