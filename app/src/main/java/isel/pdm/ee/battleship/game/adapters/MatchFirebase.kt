@@ -163,18 +163,16 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * @param gameId the id of the game
      */
     private suspend fun postGameStarted(game: Game, gameId: String) {
-        // Define Firestore paths
-        val gameDocRef = db.collection(ONGOING).document(gameId)
-        val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
-        val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
-
         try {
+            val gameDocRef = db.collection(ONGOING).document(gameId)
+            val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
+            val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
             player1BoardRef.set(game.board.toDocumentContent()).await()
             player2BoardRef.set(game.board.toDocumentContent()).await()
             println("Game state saved to Firestore successfully.")
-        } catch (e: Exception) {
-            // Handle any errors that may occur during the Firestore operation
-            println("Error saving game state to Firestore: $e")
+        }
+        catch (e: Exception) {
+            Log.e(TAG, "postGameStarted Exception: ${e.message}", e)
         }
     }
 
@@ -245,16 +243,25 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * This function is called when the player quits the game
      */
     override suspend fun quitGame() {
-        onGoingGame = checkNotNull(onGoingGame).also {
-            val game = it.first
-            val ongoingDocRef = db.collection(ONGOING).document(it.second)
-            val playerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.name.lowercase())
-            val boardRef = playerMarkerCollection.document(BOARD_FIELD)
-            boardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
-            val otherPlayerMarker = game.localPlayerMarker.other.name
-            val otherPlayerMarkerCollection = ongoingDocRef.collection(otherPlayerMarker.lowercase())
-            val otherBoardRef = otherPlayerMarkerCollection.document(BOARD_FIELD)
-            otherBoardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
+        val currentOnGoingGame = onGoingGame
+        if (currentOnGoingGame != null){
+            try {
+                val game = currentOnGoingGame.first
+                val ongoingDocRef = db.collection(ONGOING).document(currentOnGoingGame.second)
+                val playerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.name.lowercase())
+                val boardRef = playerMarkerCollection.document(BOARD_FIELD)
+                boardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
+                val otherPlayerMarker = game.localPlayerMarker.other.name
+                val otherPlayerMarkerCollection = ongoingDocRef.collection(otherPlayerMarker.lowercase())
+                val otherBoardRef = otherPlayerMarkerCollection.document(BOARD_FIELD)
+                otherBoardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
+            }catch (e: Exception){
+                Log.e(TAG, "quitGame Exception: ${e.message}", e)
+                // TODO: stopTimer() in case it gets stuck here
+            }
+        }
+        else{
+            Log.v(TAG, "quitGame currentOnGoingGame is null")
         }
     }
     /**
@@ -263,12 +270,16 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     override suspend fun end() {
         check(onGoingGame != null)
         Log.v(TAG, "end")
-        val gameDocRef = db.collection(ONGOING).document(onGoingGame!!.second)
-        val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
-        val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
-        player1BoardRef.delete().await()
-        player2BoardRef.delete().await()
-        onGoingGame = null
+        try {
+            val gameDocRef = db.collection(ONGOING).document(onGoingGame!!.second)
+            val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
+            val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
+            player1BoardRef.delete().await()
+            player2BoardRef.delete().await()
+            onGoingGame = null
+        }catch (e: Exception){
+            Log.e(TAG, "end Exception: ${e.message}", e)
+        }
     }
 }
 
