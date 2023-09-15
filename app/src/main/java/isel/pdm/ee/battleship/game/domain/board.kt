@@ -163,8 +163,9 @@ data class Board(
             for ((row, col) in shipCoordinates) {
                 val position = getMove(Coordinate(row, col))
                 if (position.wasShip!=null) {
-                    if (position.wasShip!!)
-                        throw IllegalArgumentException("Ship collision at (${row},${col})")
+                    if (position.wasShip!!) {
+                        //throw IllegalArgumentException("Ship collision at (${row},${col})")
+                    }
                 }
                 position.wasShip = true
                 position.shipType = shipType

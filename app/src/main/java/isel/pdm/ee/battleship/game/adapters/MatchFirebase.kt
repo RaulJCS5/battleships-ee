@@ -110,10 +110,10 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                             val turn = snapshotData[TURN_FIELD] as String
                             val fleet = snapshotData[FLEET_FIELD] as String
                             val quitGamePlayer = snapshotData[QUIT_GAME_FIELD] as String?
-                            Log.v(TAG_MODEL, "snapshotWithData $board")
+                            /*Log.v(TAG_MODEL, "snapshotWithData $board")
                             Log.v(TAG_MODEL, "snapshotWithData $turn")
                             Log.v(TAG_MODEL, "snapshotWithData $fleet")
-                            Log.v(TAG_MODEL, "snapshotWithData $quitGamePlayer")
+                            Log.v(TAG_MODEL, "snapshotWithData $quitGamePlayer")*/
                             val playerMarkerTurn = PlayerMarker.valueOf(turn)
                             val realBoard = Board.fromMovesList(
                                 valueOf = playerMarkerTurn,
@@ -189,12 +189,12 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     }
 
     override suspend fun makeMove(at: Coordinate) {
-        /*onGoingGame = checkNotNull(onGoingGame).also {
+        onGoingGame = checkNotNull(onGoingGame).also {
             Log.v(TAG, "makeMove")
             val game = it.copy(first = it.first.makeMove(at))
             Log.v(TAG, "makeMove game $game")
             updateGame(game.first, game.second)
-        }*/
+        }
     }
 
     override fun startTimer(time: Int, timeLimit: Int): Flow<TimeEvent> {
@@ -226,18 +226,13 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     private suspend fun updateGame(game: Game, gameId: String) {
         try {
             Log.v(TAG, "updateGame $gameId")
-            db.collection(ONGOING)
-                .document(gameId)
-                .update(game.board.toDocumentContent())
-                .addOnSuccessListener { Log.v(TAG, "updateGame addOnSuccessListener") }
-                .addOnFailureListener { e ->
-                    Log.e(
-                        TAG,
-                        "updateGame addOnFailureListener: ${e.message}",
-                        e
-                    )
-                }
-                .await()
+            val ongoingDocRef = db.collection(ONGOING).document(gameId)
+            val playerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.name.lowercase())
+            val boardRef = playerMarkerCollection.document(BOARD_FIELD)
+            boardRef.update(game.board.toDocumentContent()).await()
+            val otherPlayerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.other.name.lowercase())
+            val otherBoardRef = otherPlayerMarkerCollection.document(BOARD_FIELD)
+            otherBoardRef.update(game.board.updateTurnPlayerMarker()).await()
         } catch (e: Exception) {
             Log.e(TAG, "updateGame Exception: ${e.message}", e)
         }
