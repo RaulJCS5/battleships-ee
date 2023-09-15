@@ -176,12 +176,12 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         }
     }
 
-    override fun startTimer(time:Int): Flow<TimeEvent> {
+    override fun startTimer(time: Int, timeLimit: Int): Flow<TimeEvent> {
         return callbackFlow {
             try {
                 delay(1000)
                 val timer = time +1
-                if (timer==10){
+                if (timer==timeLimit){
                     Log.v(TAG, "TimeEnded $timer")
                     val timeEvent = TimeEnded(timer)
                     trySend(timeEvent)

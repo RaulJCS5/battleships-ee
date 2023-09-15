@@ -35,7 +35,8 @@ fun GameScreen(
     state: GameScreenState,
     onMoveRequested: (Coordinate) -> Unit = { },
     onQuitGameRequested: () -> Unit = { },
-    remainingTime: Int
+    remainingTime: Int,
+    timeLimit: Int,
 ) {
     BattleshipTheme {
         Scaffold(
@@ -70,13 +71,14 @@ fun GameScreen(
                 Spacer(modifier = Modifier.height(32.dp))
                 Row {
                     Text(
-                        text = "${stringResource(id = R.string.chronometer_timer)} ",
+                        text = "${stringResource(id = R.string.timer)} ",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.testTag(GameScreenTimerTag)
                     )
+                    val remainingTimeLimit = timeLimit - remainingTime
                     Text(
-                        text = String.format("%02d:%02d", remainingTime / 60, remainingTime % 60),
+                        text = String.format("%02d:%02d", remainingTimeLimit / 60, remainingTimeLimit % 60),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.testTag(GameScreenTimerTag)
@@ -114,6 +116,7 @@ private fun DefineFleetPreview() {
             title = R.string.game_screen_your_turn,
             game = Game()
         ),
-        remainingTime = 120,
+        remainingTime = 115,
+        timeLimit = 120
     )
 }

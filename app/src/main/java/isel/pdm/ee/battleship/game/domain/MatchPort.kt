@@ -20,6 +20,6 @@ interface Match {
     suspend fun quitGame()
     suspend fun end()
     suspend fun makeMove(at: Coordinate)
-    fun startTimer(time: Int): Flow<TimeEvent>
+    fun startTimer(time: Int, timeLimit: Int): Flow<TimeEvent>
 }
 

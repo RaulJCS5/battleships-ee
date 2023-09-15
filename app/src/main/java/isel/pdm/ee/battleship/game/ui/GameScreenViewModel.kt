@@ -27,6 +27,8 @@ enum class MatchState { IDLE, STARTING, STARTED, FINISHED }
 
 class GameScreenViewModel(private val match: Match) : ViewModel() {
 
+    val timeLimit: Int = 120 // 2 minutes / 120 seconds
+
     private val _onGoingGame = MutableStateFlow(Game())
     val onGoingGame = _onGoingGame.asStateFlow()
 
@@ -108,7 +110,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
     fun startTimer() {
         if (state == MatchState.STARTED) {
             timerJob = viewModelScope.launch {
-                match.startTimer(_remainingTime.value).collect {
+                match.startTimer(_remainingTime.value, timeLimit).collect {
                     when(it) {
                         is TimeEnded -> {
                             match.quitGame()
