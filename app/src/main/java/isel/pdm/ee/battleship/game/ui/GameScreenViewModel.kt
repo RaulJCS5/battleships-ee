@@ -131,7 +131,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
             return
         }
         else {
-            _remainingTime.value = 1
+            _remainingTime.value = 0
             timerJob?.cancel()
             timerJob = null
             Log.v(TAG, "Timer stopped")
