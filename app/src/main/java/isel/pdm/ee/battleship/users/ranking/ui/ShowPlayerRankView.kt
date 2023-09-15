@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.ui
+package isel.pdm.ee.battleship.users.ranking.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.utils.NavigateExpandablePlayerTestTag
-import isel.pdm.ee.battleship.users.model.GameRankTotals
+import isel.pdm.ee.battleship.users.ranking.domain.GameRankTotals
 
 
 @Composable

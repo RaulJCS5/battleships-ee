@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.player
+package isel.pdm.ee.battleship.users.player.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -20,6 +20,7 @@ import isel.pdm.ee.battleship.ui.RefreshingState
 import isel.pdm.ee.battleship.ui.TopBar
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
 import isel.pdm.ee.battleship.R
+import isel.pdm.ee.battleship.users.player.domain.Player
 import isel.pdm.ee.battleship.utils.NavigateAuthorTestTag
 
 data class PlayerScreenState(

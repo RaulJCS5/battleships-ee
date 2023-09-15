@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.author
+package isel.pdm.ee.battleship.users.author.ui
 
 import android.net.Uri
 import androidx.compose.foundation.clickable
@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import isel.pdm.ee.battleship.ui.NavigationHandlers
 import isel.pdm.ee.battleship.ui.TopBar
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
-import isel.pdm.ee.battleship.users.player.Author
 import isel.pdm.ee.battleship.R
+import isel.pdm.ee.battleship.users.author.domain.Author
 import isel.pdm.ee.battleship.utils.NavigateAuthorTestTag
 
 data class AuthorScreenState(

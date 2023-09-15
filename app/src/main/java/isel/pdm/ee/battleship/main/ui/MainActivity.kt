@@ -1,13 +1,13 @@
-package isel.pdm.ee.battleship
+package isel.pdm.ee.battleship.main.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import isel.pdm.ee.battleship.DependenciesContainer
 import isel.pdm.ee.battleship.lobby.ui.LobbyActivity
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
-import isel.pdm.ee.battleship.users.listAuthors.AuthorsListActivity
-import isel.pdm.ee.battleship.users.ranking.RakingListActivity
+import isel.pdm.ee.battleship.users.listAuthors.ui.AuthorsListActivity
+import isel.pdm.ee.battleship.users.ranking.ui.RakingListActivity
 import isel.pdm.ee.battleship.utils.NavigateAux
 
 class MainActivity : ComponentActivity() {

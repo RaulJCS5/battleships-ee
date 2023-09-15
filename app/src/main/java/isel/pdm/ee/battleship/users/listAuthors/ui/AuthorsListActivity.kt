@@ -1,16 +1,16 @@
-package isel.pdm.ee.battleship.users.listAuthors
+package isel.pdm.ee.battleship.users.listAuthors.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import isel.pdm.ee.battleship.DependenciesContainer
-import isel.pdm.ee.battleship.MainActivity.Companion.AUTHOR_EXTRA
+import isel.pdm.ee.battleship.main.ui.MainActivity.Companion.AUTHOR_EXTRA
 import isel.pdm.ee.battleship.ui.NavigationHandlers
-import isel.pdm.ee.battleship.users.author.AuthorActivity
+import isel.pdm.ee.battleship.users.author.ui.AuthorActivity
 import isel.pdm.ee.battleship.utils.NavigateAux
 import isel.pdm.ee.battleship.utils.viewModelInit
-import isel.pdm.ee.battleship.users.player.toLocalAuthorDto
+import isel.pdm.ee.battleship.users.author.domain.toLocalAuthorDto
 
 /**
  * The activity that hosts the screen for displaying a list of quotes. The

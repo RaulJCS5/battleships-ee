@@ -14,7 +14,7 @@
         android:name=".BattleshipApplication"
         >
         <activity
-            android:name=".MainActivity"
+            android:name=".main.ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Battleship">
             <intent-filter>
@@ -37,10 +37,10 @@
             android:exported="false">
         </activity>
         <activity
-            android:name=".users.ranking.RakingListActivity"
+            android:name=".users.ranking.ui.RakingListActivity"
             android:exported="false" />
         <activity
-            android:name=".users.author.AuthorActivity"
+            android:name=".users.author.ui.AuthorActivity"
             android:exported="false"
             android:label="@string/app_author_screen_title"
             >
@@ -49,10 +49,10 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".users.listAuthors.AuthorsListActivity"
+            android:name=".users.listAuthors.ui.AuthorsListActivity"
             android:exported="false" />
         <activity
-            android:name=".users.player.PlayerActivity"
+            android:name=".users.player.ui.PlayerActivity"
             android:exported="false"
             >
             <meta-data

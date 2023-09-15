@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.player
+package isel.pdm.ee.battleship.users.player.ui
 
 import android.os.Build
 import android.os.Bundle
@@ -6,11 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import isel.pdm.ee.battleship.DependenciesContainer
-import isel.pdm.ee.battleship.LocalTokenDto
-import isel.pdm.ee.battleship.MainActivity
+import isel.pdm.ee.battleship.main.ui.MainActivity
 import isel.pdm.ee.battleship.ui.NavigationHandlers
 import isel.pdm.ee.battleship.utils.viewModelInit
 import isel.pdm.ee.battleship.ui.RefreshingState
+import isel.pdm.ee.battleship.users.player.domain.Player
 
 /**
  * Activity that displays the information of a player

@@ -1,13 +1,13 @@
-package isel.pdm.ee.battleship.users.player
+package isel.pdm.ee.battleship.users.player.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import isel.pdm.ee.battleship.LocalTokenDto
 import kotlinx.coroutines.launch
-import isel.pdm.ee.battleship.users.model.UserOutputModel
+import isel.pdm.ee.battleship.users.ranking.domain.UserOutputModel
+import isel.pdm.ee.battleship.users.player.adapters.IPlayerService
 import isel.pdm.ee.battleship.utils.ProblemException
 import isel.pdm.ee.battleship.utils.ProblemOutputModel
 

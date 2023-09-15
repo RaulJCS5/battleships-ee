@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.ranking
+package isel.pdm.ee.battleship.users.ranking.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import isel.pdm.ee.battleship.users.model.GameRankTotals
-import isel.pdm.ee.battleship.users.player.IPlayerService
+import isel.pdm.ee.battleship.users.ranking.domain.GameRankTotals
+import isel.pdm.ee.battleship.users.player.adapters.IPlayerService
 import isel.pdm.ee.battleship.utils.ProblemException
 import isel.pdm.ee.battleship.utils.ProblemOutputModel
 

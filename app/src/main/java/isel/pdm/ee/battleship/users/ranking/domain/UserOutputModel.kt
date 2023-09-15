@@ -1,14 +1,9 @@
-package isel.pdm.ee.battleship.users.model
+package isel.pdm.ee.battleship.users.ranking.domain
 
 data class UserOutputModel(
     val id: Int,
     val username: String,
     val email: String
-)
-
-data class UserLoginOutputModel(
-    var userId: Int,
-    var token: String,
 )
 
 data class GameRankTotals(

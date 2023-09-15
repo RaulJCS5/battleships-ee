@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.ranking
+package isel.pdm.ee.battleship.users.ranking.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

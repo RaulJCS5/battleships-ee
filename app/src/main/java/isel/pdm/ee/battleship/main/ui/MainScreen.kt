@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship
+package isel.pdm.ee.battleship.main.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
 import isel.pdm.ee.battleship.utils.NavigateMainAuthorButtonTestTag
 import isel.pdm.ee.battleship.utils.NavigateMainLeaderboardButtonTestTag

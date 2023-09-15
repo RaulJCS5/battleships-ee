@@ -12,8 +12,8 @@ import isel.pdm.ee.battleship.lobby.adapters.LobbyFirebase
 import isel.pdm.ee.battleship.lobby.domain.Lobby
 import isel.pdm.ee.battleship.preferences.UserInfoRepositorySharedPrefs
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
-import isel.pdm.ee.battleship.users.player.IPlayerService
-import isel.pdm.ee.battleship.users.player.PlayerService
+import isel.pdm.ee.battleship.users.player.adapters.IPlayerService
+import isel.pdm.ee.battleship.users.player.adapters.PlayerService
 
 
 const val TAG = "BattleshipTAG"

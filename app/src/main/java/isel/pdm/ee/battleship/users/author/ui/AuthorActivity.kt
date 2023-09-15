@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.author
+package isel.pdm.ee.battleship.users.author.ui
 
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
@@ -12,12 +12,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import isel.pdm.ee.battleship.DependenciesContainer
-import isel.pdm.ee.battleship.LocalAuthorDto
-import isel.pdm.ee.battleship.MainActivity.Companion.AUTHOR_EXTRA
+import isel.pdm.ee.battleship.main.ui.MainActivity.Companion.AUTHOR_EXTRA
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.ui.NavigationHandlers
+import isel.pdm.ee.battleship.users.author.domain.Author
 import isel.pdm.ee.battleship.utils.viewModelInit
-import isel.pdm.ee.battleship.users.player.Author
 
 class AuthorActivity : ComponentActivity() {
     /**

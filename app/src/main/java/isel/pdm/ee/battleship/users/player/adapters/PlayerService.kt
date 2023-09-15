@@ -1,8 +1,9 @@
-package isel.pdm.ee.battleship.users.player
+package isel.pdm.ee.battleship.users.player.adapters
 
 import isel.pdm.ee.battleship.R
-import isel.pdm.ee.battleship.users.model.GameRankTotals
-import isel.pdm.ee.battleship.users.model.UserOutputModel
+import isel.pdm.ee.battleship.users.ranking.domain.GameRankTotals
+import isel.pdm.ee.battleship.users.ranking.domain.UserOutputModel
+import isel.pdm.ee.battleship.users.author.domain.Author
 
 /**
  * Abstraction that characterizes the player.
@@ -21,7 +22,8 @@ class PlayerService() : IPlayerService {
             GameRankTotals(UserOutputModel(123,"tomcruise","tomcruise@hotmail.com"),9,7,3)
         )
         list.add(
-            GameRankTotals(UserOutputModel(456,"jondavolta","jondavolta@hotmail.com"),9,3,7))
+            GameRankTotals(UserOutputModel(456,"jondavolta","jondavolta@hotmail.com"),9,3,7)
+        )
         return list
     }
 

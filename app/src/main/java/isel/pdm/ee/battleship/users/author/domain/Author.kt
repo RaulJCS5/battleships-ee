@@ -1,16 +1,7 @@
-package isel.pdm.ee.battleship.users.player
+package isel.pdm.ee.battleship.users.author.domain
 
-import isel.pdm.ee.battleship.LocalAuthorDto
-import isel.pdm.ee.battleship.LocalPlayerDto
+import isel.pdm.ee.battleship.users.author.ui.LocalAuthorDto
 
-/**
- * The domain entity for representing players
- */
-data class Player(val id: Int, val username: String, val email: String) {
-    init {
-        require(username.isNotBlank() && email.isNotBlank())
-    }
-}
 
 /**
  * The domain entity for representing authors
@@ -30,13 +21,6 @@ data class Author(
 }
 
 /**
- * Creates a [Player] instance from the given DTO
- */
-fun Player(localDto: LocalPlayerDto): Player {
-    return Player(id = localDto.id, username = localDto.userName, email = localDto.email)
-}
-
-/**
  * Creates a [Author] instance from the given DTO
  */
 fun Author(localDto: LocalAuthorDto): Author {
@@ -51,11 +35,6 @@ fun Author(localDto: LocalAuthorDto): Author {
     )
 }
 
-/**
- * Converts this user to a local DTO, that can be placed in Bundles and
- * passed around between activities.
- */
-fun Player.toLocalPlayerDto() = LocalPlayerDto(id, username, email)
 
 /**
  * Converts this author to a local DTO, that can be placed in Bundles and

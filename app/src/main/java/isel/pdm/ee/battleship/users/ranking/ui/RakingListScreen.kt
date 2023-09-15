@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.ranking
+package isel.pdm.ee.battleship.users.ranking.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,11 +14,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.tooling.preview.Preview
 import isel.pdm.ee.battleship.ui.NavigationHandlers
 import isel.pdm.ee.battleship.ui.RefreshingState
-import isel.pdm.ee.battleship.ui.ShowPlayerRankView
 import isel.pdm.ee.battleship.ui.TopBar
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
-import isel.pdm.ee.battleship.users.model.GameRankTotals
-import isel.pdm.ee.battleship.users.model.UserOutputModel
+import isel.pdm.ee.battleship.users.ranking.domain.GameRankTotals
+import isel.pdm.ee.battleship.users.ranking.domain.UserOutputModel
 import isel.pdm.ee.battleship.utils.NavigatePlayersListScreenTestTag
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.ui.RefreshFab

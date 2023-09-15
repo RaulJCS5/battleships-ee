@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.ui
+package isel.pdm.ee.battleship.users.listAuthors.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import isel.pdm.ee.battleship.users.player.Author
+import isel.pdm.ee.battleship.users.author.domain.Author
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.utils.NavigateExpandableAuthorTestTag
 

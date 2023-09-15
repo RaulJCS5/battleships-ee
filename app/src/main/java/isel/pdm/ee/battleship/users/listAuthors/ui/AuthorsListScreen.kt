@@ -1,4 +1,4 @@
-package isel.pdm.ee.battleship.users.listAuthors
+package isel.pdm.ee.battleship.users.listAuthors.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,11 +11,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.tooling.preview.Preview
-import isel.pdm.ee.battleship.ui.ExpandableAuthorView
 import isel.pdm.ee.battleship.ui.NavigationHandlers
 import isel.pdm.ee.battleship.ui.TopBar
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
-import isel.pdm.ee.battleship.users.player.Author
+import isel.pdm.ee.battleship.users.author.domain.Author
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.utils.NavigateAuthorsListScreenTestTag
 
