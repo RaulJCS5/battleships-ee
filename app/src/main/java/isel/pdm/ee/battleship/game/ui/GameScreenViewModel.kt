@@ -114,6 +114,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                     when(it) {
                         is TimeEnded -> {
                             match.quitGame()
+                            stopTimer()
                             //_remainingTime.value = timeLimit
                         }
                         is TimeUpdated -> {
