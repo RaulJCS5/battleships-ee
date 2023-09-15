@@ -263,7 +263,11 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     override suspend fun end() {
         check(onGoingGame != null)
         Log.v(TAG, "end")
-        db.collection(ONGOING).document(onGoingGame!!.second).delete().await()
+        val gameDocRef = db.collection(ONGOING).document(onGoingGame!!.second)
+        val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
+        val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
+        player1BoardRef.delete().await()
+        player2BoardRef.delete().await()
         onGoingGame = null
     }
 }
