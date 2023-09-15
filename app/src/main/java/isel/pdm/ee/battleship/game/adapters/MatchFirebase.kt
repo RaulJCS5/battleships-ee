@@ -201,8 +201,8 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         return callbackFlow {
             try {
                 delay(1000)
-                val timer = time +1
-                if (timer>=timeLimit){
+                val timer = time + 1
+                if (timer>timeLimit){
                     Log.v(TAG, "TimeEnded $timer")
                     val timeEvent = TimeEnded(timer)
                     trySend(timeEvent)
@@ -230,9 +230,12 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
             val playerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.name.lowercase())
             val boardRef = playerMarkerCollection.document(BOARD_FIELD)
             boardRef.update(game.board.toDocumentContent()).await()
-            val otherPlayerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.other.name.lowercase())
+            val otherPlayerMarker = game.localPlayerMarker.other.name
+            val otherPlayerMarkerCollection = ongoingDocRef.collection(otherPlayerMarker.lowercase())
             val otherBoardRef = otherPlayerMarkerCollection.document(BOARD_FIELD)
-            otherBoardRef.update(game.board.updateTurnPlayerMarker()).await()
+            otherBoardRef.update(TURN_FIELD, otherPlayerMarker).await()
+            /*val docRef = otherBoardRef.get().await()
+            Log.v(TAG_MODEL, "updateGame docRef $docRef")*/
         } catch (e: Exception) {
             Log.e(TAG, "updateGame Exception: ${e.message}", e)
         }
@@ -242,12 +245,17 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * This function is called when the player quits the game
      */
     override suspend fun quitGame() {
-        /*onGoingGame = checkNotNull(onGoingGame).also {
-            db.collection(ONGOING)
-                .document(it.second)
-                .update(QUIT_GAME_FIELD, it.first.localPlayerMarker)
-                .await()
-        }*/
+        onGoingGame = checkNotNull(onGoingGame).also {
+            val game = it.first
+            val ongoingDocRef = db.collection(ONGOING).document(it.second)
+            val playerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.name.lowercase())
+            val boardRef = playerMarkerCollection.document(BOARD_FIELD)
+            boardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
+            val otherPlayerMarker = game.localPlayerMarker.other.name
+            val otherPlayerMarkerCollection = ongoingDocRef.collection(otherPlayerMarker.lowercase())
+            val otherBoardRef = otherPlayerMarkerCollection.document(BOARD_FIELD)
+            otherBoardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
+        }
     }
     /**
      * This function is called when the game is ended

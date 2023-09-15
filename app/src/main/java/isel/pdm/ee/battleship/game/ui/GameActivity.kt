@@ -97,7 +97,6 @@ class GameActivity: ComponentActivity() {
         }
         onBackPressedDispatcher.addCallback {
             viewModel.quitGame()
-            finish()
         }
     }
     private val matchInfoParcelable: MatchInfoParcelable by lazy {
