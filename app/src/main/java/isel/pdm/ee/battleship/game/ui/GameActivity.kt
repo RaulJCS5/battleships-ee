@@ -3,6 +3,7 @@ package isel.pdm.ee.battleship.game.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -11,6 +12,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import isel.pdm.ee.battleship.DependenciesContainer
 import isel.pdm.ee.battleship.R
+import isel.pdm.ee.battleship.TAG
+import isel.pdm.ee.battleship.game.domain.HasWinner
+import isel.pdm.ee.battleship.game.domain.getResult
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import isel.pdm.ee.battleship.preferences.domain.UserInfo
@@ -61,6 +65,27 @@ class GameActivity: ComponentActivity() {
                 onQuitGameRequested = { viewModel.quitGame() },
                 remainingTime = remainingTime
             )
+            when(currentState){
+                MatchState.FINISHED -> {
+                    if (currentGame.quitGameBy != null) {
+                        MatchEndedDialog(
+                            localPLayerMarker = currentGame.localPlayerMarker,
+                            result = HasWinner(currentGame.quitGameBy!!.other),
+                            onDismissRequested = { finish() }
+                        )
+                        Log.v(TAG, "This player quit the game ${currentGame.quitGameBy}")
+                    } else {
+                        MatchEndedDialog(
+                            localPLayerMarker = currentGame.localPlayerMarker,
+                            result = currentGame.getResult(),
+                            onDismissRequested = { finish() }
+                        )
+                        Log.v(TAG, "Game finished")
+                    }
+                }
+                else -> {
+                }
+            }
             if (currentGame.localPlayerMarker == currentGame.board.turn) {
                 viewModel.startTimer()
             }

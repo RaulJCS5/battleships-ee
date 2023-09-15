@@ -30,7 +30,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
     private val _onGoingGame = MutableStateFlow(Game())
     val onGoingGame = _onGoingGame.asStateFlow()
 
-    private val _remainingTime = MutableStateFlow(1)
+    private val _remainingTime = MutableStateFlow(0)
     val remainingTime = _remainingTime.asStateFlow()
 
     private var _state by mutableStateOf(MatchState.IDLE)

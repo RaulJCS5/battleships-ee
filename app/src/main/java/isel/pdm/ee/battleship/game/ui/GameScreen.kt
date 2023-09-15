@@ -67,7 +67,7 @@ fun GameScreen(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Text(
-                    text = "${stringResource(id = R.string.remaining_time)} $remainingTime",
+                    text = "${stringResource(id = R.string.remaining_time)} ${remainingTime + 1}",
                     style = MaterialTheme.typography.displaySmall, // Customize the style as needed
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.testTag(GameScreenTimerTag)

@@ -11,4 +11,4 @@ fun Game.makeMove(at: Coordinate): Game {
     return copy(board = board.makeMove(at))
 }
 
-fun Game.getResult() = OnGoing()
+fun Game.getResult():BoardResult = OnGoing()

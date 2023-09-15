@@ -13,4 +13,12 @@
     <string name="game_screen_quit_game">Quit game</string>
     <string name="game_screen_idle">Idle</string>
     <string name="remaining_time">Remaining time</string>
+    <string name="match_ended_dialog_text_tied_match">The match is tied</string>
+    <string name="match_ended_dialog_text_local_won">Congratulations, you won!</string>
+    <string name="match_ended_dialog_text_opponent_won">Yout opponent has won</string>
+    <string name="match_ended_ok_button">OK</string>
+    <string name="match_ended_dialog_title">Match ended</string>
+    <string name="starting_match_cancel_button">Cancel</string>
+    <string name="starting_match_dialog_title">Match is starting</string>
+    <string name="starting_match_dialog_text">Waiting for opponent to join</string>
 </resources>
