@@ -244,23 +244,24 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      */
     override suspend fun quitGame() {
         val currentOnGoingGame = onGoingGame
-        if (currentOnGoingGame != null){
+        if (currentOnGoingGame != null) {
             try {
                 val game = currentOnGoingGame.first
                 val ongoingDocRef = db.collection(ONGOING).document(currentOnGoingGame.second)
-                val playerMarkerCollection = ongoingDocRef.collection(game.localPlayerMarker.name.lowercase())
-                val boardRef = playerMarkerCollection.document(BOARD_FIELD)
-                boardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
                 val otherPlayerMarker = game.localPlayerMarker.other.name
-                val otherPlayerMarkerCollection = ongoingDocRef.collection(otherPlayerMarker.lowercase())
+                val otherPlayerMarkerCollection =
+                    ongoingDocRef.collection(otherPlayerMarker.lowercase())
                 val otherBoardRef = otherPlayerMarkerCollection.document(BOARD_FIELD)
                 otherBoardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
-            }catch (e: Exception){
+                val playerMarkerCollection =
+                    ongoingDocRef.collection(game.localPlayerMarker.name.lowercase())
+                val boardRef = playerMarkerCollection.document(BOARD_FIELD)
+                boardRef.update(QUIT_GAME_FIELD, game.localPlayerMarker).await()
+            } catch (e: Exception) {
                 Log.e(TAG, "quitGame Exception: ${e.message}", e)
                 // TODO: stopTimer() in case it gets stuck here
             }
-        }
-        else{
+        } else {
             Log.v(TAG, "quitGame currentOnGoingGame is null")
         }
     }
