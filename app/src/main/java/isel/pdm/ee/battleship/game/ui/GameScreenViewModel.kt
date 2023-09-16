@@ -65,11 +65,11 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
             null
         }
 
-    fun startMatch(localPlayer: PlayerInfo, matching: Matching) {
+    fun startMatch(localPlayer: PlayerInfo, matching: Matching) : Job? {
         if (state == MatchState.IDLE) {
             Log.v(TAG, "startMatch: $state")
             _state = MatchState.STARTING
-            viewModelScope.launch {
+            val startAndObserveGameEventsJob = viewModelScope.launch {
                 // match.startAndObserveGameEvents(localPlayer, matching) subscription moment "I WANT"
                 // This executes because I enter the match and I throw a koroutine to start the game
                 // .collect{  } moment "HOW TO REACT"
@@ -101,10 +101,11 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                         match.end()
                 }
             }
+            return startAndObserveGameEventsJob
         }
         else {
             Log.v(TAG, "startMatch: $state")
-            null
+            return null
         }
     }
 

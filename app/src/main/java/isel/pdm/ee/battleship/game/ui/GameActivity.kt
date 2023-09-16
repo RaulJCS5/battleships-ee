@@ -83,7 +83,7 @@ class GameActivity: ComponentActivity() {
         if (viewModel.state == MatchState.IDLE) {
             viewModel.startMatch(localPlayer, matching)
         }
-        onBackPressedDispatcher.addCallback {
+        onBackPressedDispatcher.addCallback(owner = this, enabled = true) {
             viewModel.quitGame()
             finish()
         }
