@@ -49,6 +49,7 @@ fun Socials(
     socials: Iterable<SocialInfo>
 ) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.widthIn(min = 120.dp, max = 240.dp)
     ) {
         socials.forEach {
