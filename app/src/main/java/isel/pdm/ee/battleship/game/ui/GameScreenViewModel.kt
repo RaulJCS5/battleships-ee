@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import isel.pdm.ee.battleship.TAG
+import isel.pdm.ee.battleship.TAG_MODEL
+import isel.pdm.ee.battleship.game.domain.BoardResult
 import isel.pdm.ee.battleship.game.domain.Coordinate
 import isel.pdm.ee.battleship.game.domain.Game
 import isel.pdm.ee.battleship.game.domain.GameEnded
@@ -18,6 +20,7 @@ import isel.pdm.ee.battleship.game.domain.TimeUpdated
 import isel.pdm.ee.battleship.game.domain.getResult
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
+import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +28,10 @@ import kotlinx.coroutines.launch
 
 enum class MatchState { IDLE, STARTING, STARTED, FINISHED }
 
-class GameScreenViewModel(private val match: Match) : ViewModel() {
+class GameScreenViewModel(
+    private val match: Match,
+    val userInfoRepo: UserInfoRepository,
+) : ViewModel() {
 
     val timeLimit: Int = 12 // 2 minutes / 120 seconds
 
@@ -82,6 +88,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
         if (state == MatchState.IDLE) {
             Log.v(TAG, "startMatch: $state")
             _state = MatchState.STARTING
+            val localPlayerInfo = PlayerInfo(checkNotNull(userInfoRepo.userInfo))
             val startAndObserveGameEventsJob = viewModelScope.launch {
                 // match.startAndObserveGameEvents(localPlayer, matching) subscription moment "I WANT"
                 // This executes because I enter the match and I throw a koroutine to start the game
@@ -91,6 +98,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                 // This is the moment where I say what to do with the element that arrived from the Flow
                 match.startAndObserveGameEvents(localPlayer, matching).collect {
                     _onGoingGame.value = it.game
+                    var winner: BoardResult? = null
                     _state = when (it) {
                         is GameStarted -> {
                             Log.v(TAG, "GameStarted 1")
@@ -103,6 +111,10 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                         else ->
                             if (it.game.getResult() !is OnGoing) {
                                 Log.v(TAG, "GameEnded 2")
+                                it.game.getResult().also { result ->
+                                    Log.v(TAG, "Winner: $result")
+                                    winner = result
+                                }
                                 MatchState.FINISHED
                             }
                             else {
@@ -110,8 +122,20 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                                 MatchState.STARTED
                             }
                     }
-                    if (_state == MatchState.FINISHED)
+                    if (_state == MatchState.FINISHED) {
+                        var resultWinner:String? = null
+                        if (winner != null) {
+                            Log.v(TAG_MODEL, "Winner: ${BoardResult.getWinner(winner!!)}")
+                            resultWinner = BoardResult.getWinner(winner!!)
+                        }else{
+                            Log.v(TAG_MODEL, "Quit game quitGameBy: ${it.game.quitGameBy}")
+                            resultWinner = it.game.quitGameBy?.other?.name
+                        }
+                        if (resultWinner != null) {
+                            match.saveGameAndUpdate(localPlayerInfo, resultWinner)
+                        }
                         match.end()
+                    }
                 }
             }
             gameMonitor = Pair(startAndObserveGameEventsJob, matching)

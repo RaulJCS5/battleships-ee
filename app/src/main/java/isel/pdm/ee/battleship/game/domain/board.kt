@@ -1,8 +1,5 @@
 package isel.pdm.ee.battleship.game.domain
 
-import android.util.Log
-import isel.pdm.ee.battleship.TAG_MODEL
-
 
 const val BOARD_FIELD= "board"
 const val TURN_FIELD = "turn"
@@ -285,7 +282,7 @@ fun Board.hasWon(playerMarker: PlayerMarker): Boolean {
             } else
                 false
         }
-        Log.v(TAG_MODEL, "hasWon: ${filteredList.size} == ${ShipType.getShipsAllTiles()}")
+        //Log.v(TAG_MODEL, "hasWon: ${filteredList.size} == ${ShipType.getShipsAllTiles()}")
         if (filteredList.size == 2/*ShipType.getShipsAllTiles()*/) { // TODO: Change this to the number of tiles of all ships
             return true
         }
@@ -300,10 +297,21 @@ fun Board.hasWon(playerMarker: PlayerMarker): Boolean {
  * [Tied] to signal that the game is tied.
  * [OnGoing] to signal the game is still ongoing.
  */
-open class BoardResult
-class HasWinner(val winner: PlayerMarker) : BoardResult()
-class Tied : BoardResult()
-class OnGoing : BoardResult()
+open class BoardResult(winner: PlayerMarker? = null) {
+    companion object {
+        fun getWinner(winner: BoardResult): String? {
+            return when (winner) {
+                is HasWinner -> winner.winner.name
+                is Tied -> null
+                else -> null
+            }
+        }
+    }
+}
+
+class HasWinner(val winner: PlayerMarker) : BoardResult(winner)
+class Tied : BoardResult(null)
+class OnGoing : BoardResult(null)
 
 /**
  * Gets the current result of the board.

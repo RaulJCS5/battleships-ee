@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import isel.pdm.ee.battleship.TAG
-import isel.pdm.ee.battleship.TAG_MODEL
 import isel.pdm.ee.battleship.game.domain.BOARD_FIELD
 import isel.pdm.ee.battleship.game.domain.Board
 import isel.pdm.ee.battleship.game.domain.Coordinate
@@ -38,7 +37,12 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     private val PLAYER1: String = "player1"
     private val PLAYER2: String = "player2"
     private val QUIT_GAME_FIELD: String = "quitgame"
+    private val GAME_ID: String = "gameid"
+    private val WINNER_FIELD: String = "winner"
+    private val GAME_ID_LIST_FIELD: String = "gameidlist"
     private val ONGOING: String = "ongoing"
+    private val SAVE_GAME: String = "savegame"
+    private val GAMES_FIELD: String = "games"
     private var onGoingGame: Pair<Game, String>? = null
     /**
      * This function is called when the game is started and is responsible for subscribing to the game state updates.
@@ -294,15 +298,55 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         check(onGoingGame != null)
         Log.v(TAG, "end")
         try {
-            val gameDocRef = db.collection(ONGOING).document(onGoingGame!!.second)
+            //saveGame()
+            /*val gameDocRef = db.collection(ONGOING).document(onGoingGame!!.second)
             val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
             val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
             player1BoardRef.delete().await()
-            player2BoardRef.delete().await()
+            player2BoardRef.delete().await()*/
             onGoingGame = null
         }catch (e: Exception){
             Log.e(TAG, "end Exception: ${e.message}", e)
         }
     }
+
+    override suspend fun saveGameAndUpdate(localPlayer: PlayerInfo, resultWinner: String) {
+        val gameId = onGoingGame!!.second
+        val gameDocRef = db.collection(SAVE_GAME).document(localPlayer.info.nick)
+        val gamesCollection = gameDocRef.collection(gameId).document(GAMES_FIELD)
+
+        // Check if the user already exists
+        val userDocSnapshot = gameDocRef.get().await()
+
+        if (userDocSnapshot.exists()) {
+            // User exists, update their existing games
+            val existingGames = (userDocSnapshot[GAME_ID_LIST_FIELD] as? List<HashMap<String, String>> ?: emptyList()).toMutableList()
+            existingGames += hashMapOf(GAME_ID to gameId, WINNER_FIELD to resultWinner) // Add the new game to the list of existing games
+
+            // Update the user document with the new game and winner field
+            gameDocRef.update(
+                mapOf(
+                    GAME_ID_LIST_FIELD to existingGames
+                )
+            ).await()
+        } else {
+            // User doesn't exist, create a new user document
+            gameDocRef.set(
+                mapOf(
+                    GAME_ID_LIST_FIELD to listOf(hashMapOf(GAME_ID to gameId, WINNER_FIELD to resultWinner)) // Initialize with the new game
+                )
+            ).await()
+        }
+
+        // Set the game data
+        gamesCollection.set(
+            hashMapOf(
+                WINNER_FIELD to resultWinner,
+                GAME_ID to gameId
+            )
+        ).await()
+    }
+
+
 }
 

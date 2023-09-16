@@ -27,7 +27,7 @@ class GameActivity: ComponentActivity() {
     private val viewModel by viewModels<GameScreenViewModel> {
         viewModelInit {
             val app = (application as DependenciesContainer)
-            GameScreenViewModel(app.match)
+            GameScreenViewModel(app.match, app.userInfoRepo)
         }
     }
 

@@ -63,5 +63,11 @@ interface Match {
      * TODO: @throws IllegalStateException if a game is in progress
      */
     fun startTimer(time: Int, timeLimit: Int): Flow<TimeEvent>
+
+    /**
+     * Saves the game.
+     * @param [localPlayer] the local player information
+     */
+    suspend fun saveGameAndUpdate(localPlayer: PlayerInfo, resultWinner: String)
 }
 
