@@ -9,7 +9,19 @@ enum class ShipType(val size: Int, name: String) {
     BATTLESHIP(4, "BATTLESHIP"),
     SUBMARINE(3, "SUBMARINE"),
     CRUISER(3, "CRUISER"),
-    DESTROYER(2, "DESTROYER")
+    DESTROYER(2, "DESTROYER");
+
+    companion object {
+
+        /**
+         * Gets the sum of all ships' sizes.
+         * @return The sum of all ships' sizes.
+         * @see ShipType.size
+         */
+        fun getShipsAllTiles(): Int {
+            return ShipType.values().sumOf { it.size }
+        }
+    }
 }
 
 /**

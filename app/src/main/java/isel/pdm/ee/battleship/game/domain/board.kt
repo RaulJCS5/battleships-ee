@@ -1,5 +1,8 @@
 package isel.pdm.ee.battleship.game.domain
 
+import android.util.Log
+import isel.pdm.ee.battleship.TAG_MODEL
+
 
 const val BOARD_FIELD= "board"
 const val TURN_FIELD = "turn"
@@ -271,9 +274,25 @@ data class Board(
 }
 
 // TODO: Implement the results of the game (win, lose, tie)
-fun isTied(): Boolean = false
 
-fun hasWon(playerMarker: PlayerMarker): Boolean = false
+fun Board.hasWon(playerMarker: PlayerMarker): Boolean {
+    // Check if all ships of have been sunk
+    if (playerMarker != turn) {
+        val flattenTiles = tiles.flatten()
+        val filteredList = flattenTiles.filter {
+            if (it.wasShip != null) {
+                it.wasShip!! && it.wasShoot
+            } else
+                false
+        }
+        Log.v(TAG_MODEL, "hasWon: ${filteredList.size} == ${ShipType.getShipsAllTiles()}")
+        if (filteredList.size == 2/*ShipType.getShipsAllTiles()*/) { // TODO: Change this to the number of tiles of all ships
+            return true
+        }
+        return false
+    }
+    return false
+}
 
 /**
  * Sum type used to describe board results occurring while the match is ongoing.
@@ -289,10 +308,9 @@ class OnGoing : BoardResult()
 /**
  * Gets the current result of the board.
  */
-fun Board.getResult(): BoardResult = OnGoing()
-    /*when {
+fun Board.getResult(): BoardResult = when {
         hasWon(PlayerMarker.PLAYER1) -> HasWinner(PlayerMarker.PLAYER1)
         hasWon(PlayerMarker.PLAYER2) -> HasWinner(PlayerMarker.PLAYER2)
-        toMovesList().all { it != null } -> Tied()
+        //isTied() -> Tied()
         else -> OnGoing()
-    }*/
+    }
