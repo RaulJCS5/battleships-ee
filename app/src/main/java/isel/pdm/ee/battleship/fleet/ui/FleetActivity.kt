@@ -49,7 +49,10 @@ class FleetActivity: ComponentActivity() {
                 },
                 fetchSetFleet = {
                     // TODO: Send fleet to the lobby
-                    LobbyActivity.navigate(this)
+                    LobbyActivity.navigate(
+                        origin = this@FleetActivity,
+                        mutableList = viewModel.allShipsAndLayouts?.getOrNull()?.toMutableList() ?: mutableListOf()
+                    )
                 }
             )
         }
