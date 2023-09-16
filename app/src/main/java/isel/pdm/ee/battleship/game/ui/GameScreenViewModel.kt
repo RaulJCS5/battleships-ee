@@ -34,7 +34,7 @@ class GameScreenViewModel(
     val userInfoRepo: UserInfoRepository,
 ) : ViewModel() {
 
-    val timeLimit: Int = 12 // 2 minutes / 120 seconds
+    val timeLimit: Int = 120 // 2 minutes / 120 seconds
 
     private val _onGoingGame = MutableStateFlow(Game())
     val onGoingGame = _onGoingGame.asStateFlow()

@@ -283,7 +283,7 @@ fun Board.hasWon(playerMarker: PlayerMarker): Boolean {
                 false
         }
         //Log.v(TAG_MODEL, "hasWon: ${filteredList.size} == ${ShipType.getShipsAllTiles()}")
-        if (filteredList.size == 2/*ShipType.getShipsAllTiles()*/) { // TODO: Change this to the number of tiles of all ships
+        if (filteredList.size == ShipType.getShipsAllTiles()) { // TODO: Change this to the number of tiles of all ships
             return true
         }
         return false
