@@ -41,27 +41,40 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
 
     private var timerJob: Job? = null
 
+    private var gameMonitor: Pair<Job, Matching>? = null
+
     fun makeMove(at: Coordinate): Job? =
-        if (state == MatchState.STARTED) {
-            viewModelScope.launch {
-                match.makeMove(at)
-                stopTimer()
-                _remainingTime.value = 0
+        if (gameMonitor != null) {
+            if (state == MatchState.STARTED) {
+                viewModelScope.launch {
+                    match.makeMove(at)
+                    stopTimer()
+                    _remainingTime.value = 0
+                }
+            } else {
+                Log.v(TAG, "No move")
+                null
             }
-        }
-        else {
-            Log.v(TAG, "No move")
+        } else {
+            Log.v(TAG, "No game, no move")
             null
         }
 
     fun quitGame(): Job? =
-        if (state == MatchState.STARTED)
-            viewModelScope.launch {
-                match.quitGame()
-                stopTimer()
+        if (gameMonitor != null) {
+            if (state == MatchState.STARTED)
+                viewModelScope.launch {
+                    //gameMonitor?.first?.cancel()
+                    gameMonitor = null
+                    match.quitGame()
+                    stopTimer()
+                }
+            else {
+                Log.v(TAG, "No quit game")
+                null
             }
-        else {
-            Log.v(TAG, "No quit game")
+        } else {
+            Log.v(TAG, "No game no quit game")
             null
         }
 
@@ -101,6 +114,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                         match.end()
                 }
             }
+            gameMonitor = Pair(startAndObserveGameEventsJob, matching)
             return startAndObserveGameEventsJob
         }
         else {
@@ -110,40 +124,50 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
     }
 
     fun startTimer() {
-        if (state == MatchState.STARTED) {
-            timerJob = viewModelScope.launch {
-                match.startTimer(_remainingTime.value, timeLimit).collect {
-                    when(it) {
-                        is TimeEnded -> {
-                            match.quitGame()
-                            stopTimer()
-                            //_remainingTime.value = timeLimit
-                        }
-                        is TimeUpdated -> {
-                            _remainingTime.value = it.time
-                        }
-                        else -> {
-                            Log.v(TAG, "No time")
+        if (gameMonitor != null) {
+            if (state == MatchState.STARTED) {
+                timerJob = viewModelScope.launch {
+                    match.startTimer(_remainingTime.value, timeLimit).collect {
+                        when (it) {
+                            is TimeEnded -> {
+                                match.quitGame()
+                                stopTimer()
+                                //_remainingTime.value = timeLimit
+                            }
+
+                            is TimeUpdated -> {
+                                _remainingTime.value = it.time
+                            }
+
+                            else -> {
+                                Log.v(TAG, "No time")
+                            }
                         }
                     }
                 }
+            } else {
+                Log.v(TAG, "No start timer")
             }
         }
         else {
-            Log.v(TAG, "No start timer")
+            Log.v(TAG, "No game no start timer")
         }
     }
 
     private fun stopTimer() {
-        if (timerJob == null) {
-            Log.v(TAG, "No timer to stop")
-            return
+        if (gameMonitor != null) {
+            if (timerJob == null) {
+                Log.v(TAG, "No timer to stop")
+                return
+            } else {
+                //_remainingTime.value = 0
+                timerJob?.cancel()
+                timerJob = null
+                Log.v(TAG, "Timer stopped")
+            }
         }
         else {
-            //_remainingTime.value = 0
-            timerJob?.cancel()
-            timerJob = null
-            Log.v(TAG, "Timer stopped")
+            Log.v(TAG, "No game no timer to stop")
         }
     }
 }
