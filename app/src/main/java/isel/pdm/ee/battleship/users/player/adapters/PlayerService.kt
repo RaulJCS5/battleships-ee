@@ -3,6 +3,7 @@ package isel.pdm.ee.battleship.users.player.adapters
 import com.google.firebase.firestore.FirebaseFirestore
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.game.adapters.GAME_ID_LIST_FIELD
+import isel.pdm.ee.battleship.game.adapters.NO_WIN
 import isel.pdm.ee.battleship.game.adapters.SAVE_GAME
 import isel.pdm.ee.battleship.game.adapters.WINNER_FIELD
 import isel.pdm.ee.battleship.preferences.domain.UserInfo
@@ -35,12 +36,13 @@ class PlayerService(private val db : FirebaseFirestore) : IPlayerService {
 
         for (documentSnapshot in querySnapshot) {
             val nick = documentSnapshot.id
-            val gameIds = documentSnapshot.get(GAME_ID_LIST_FIELD) as? List<String> ?: emptyList()
-            val winners = documentSnapshot.get(WINNER_FIELD) as? List<String> ?: emptyList()
-
+            val gameIds = documentSnapshot.get(GAME_ID_LIST_FIELD) as? MutableList<HashMap<String,String>> ?: emptyList()
+            val winnersFilter = gameIds.filter {
+                it[WINNER_FIELD] != NO_WIN
+            }
             // Calculate the number of played, won, and lost games based on your data
             val playedGames = gameIds.size
-            val winGames = winners.size
+            val winGames = winnersFilter.size
             val lostGames = playedGames - winGames
 
             val gameRankTotals = GameRankTotals(UserOutputModel(floor(Math.random()).toInt(),nick,"moto"), playedGames, winGames, lostGames)

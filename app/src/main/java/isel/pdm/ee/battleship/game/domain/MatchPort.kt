@@ -70,7 +70,8 @@ interface Match {
      */
     suspend fun saveGameAndUpdate(
         localPlayer: PlayerInfo,
-        resultWinner: PlayerMarker
+        resultWinner: PlayerMarker,
+        localPlayerMarker: PlayerMarker
     )
 }
 

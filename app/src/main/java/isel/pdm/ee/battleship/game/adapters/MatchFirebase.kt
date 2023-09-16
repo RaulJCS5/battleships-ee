@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import isel.pdm.ee.battleship.TAG
+import isel.pdm.ee.battleship.TAG_MODEL
 import isel.pdm.ee.battleship.game.domain.BOARD_FIELD
 import isel.pdm.ee.battleship.game.domain.Board
 import isel.pdm.ee.battleship.game.domain.Coordinate
@@ -33,6 +34,7 @@ val PLAYER2: String = "player2"
 val QUIT_GAME_FIELD: String = "quitgame"
 val GAME_ID: String = "gameid"
 val WINNER_FIELD: String = "winner"
+val NO_WIN: String = "no win"
 val GAME_ID_LIST_FIELD: String = "gameidlist"
 val ONGOING: String = "ongoing"
 val SAVE_GAME: String = "savegame"
@@ -313,12 +315,14 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
 
     override suspend fun saveGameAndUpdate(
         localPlayer: PlayerInfo,
-        resultWinner: PlayerMarker
+        resultWinner: PlayerMarker,
+        localPlayerMarker: PlayerMarker
     ) {
+        Log.v(TAG_MODEL, "resultWinner: $resultWinner localPlayerMarker: $localPlayerMarker")
         val gameId = onGoingGame!!.second
         val gameDocRef = db.collection(SAVE_GAME).document(localPlayer.info.nick)
-        val gamesCollection = gameDocRef.collection(gameId).document(GAMES_FIELD)
-
+        val isWinner = resultWinner == localPlayerMarker
+        val playerWinner = if(isWinner) resultWinner.name else NO_WIN
         // Check if the user already exists
         val userDocSnapshot = gameDocRef.get().await()
 
@@ -326,7 +330,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
             // User exists, update their existing games
             val existingGames = (userDocSnapshot[GAME_ID_LIST_FIELD] as? List<HashMap<String, String>> ?: emptyList()).toMutableList()
 
-            existingGames += hashMapOf(GAME_ID to gameId, WINNER_FIELD to resultWinner.name) // Add the new game to the list of existing games
+            existingGames += hashMapOf(GAME_ID to gameId, WINNER_FIELD to playerWinner) // Add the new game to the list of existing games
 
             // Update the user document with the new game and winner field
             gameDocRef.update(
@@ -338,18 +342,18 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
             // User doesn't exist, create a new user document
             gameDocRef.set(
                 mapOf(
-                    GAME_ID_LIST_FIELD to listOf(hashMapOf(GAME_ID to gameId, WINNER_FIELD to resultWinner)) // Initialize with the new game
+                    GAME_ID_LIST_FIELD to listOf(hashMapOf(GAME_ID to gameId, WINNER_FIELD to playerWinner)) // Initialize with the new game
                 )
             ).await()
         }
-
+/*
         // Set the game data
         gamesCollection.set(
             hashMapOf(
                 WINNER_FIELD to resultWinner,
                 GAME_ID to gameId
             )
-        ).await()
+        ).await()*/
     }
 
 

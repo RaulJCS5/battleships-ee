@@ -133,7 +133,7 @@ class GameScreenViewModel(
                             it.game.quitGameBy?.other
                         }
                         if (resultWinner != null) {
-                            match.saveGameAndUpdate(localPlayerInfo, resultWinner)
+                            match.saveGameAndUpdate(localPlayerInfo, resultWinner, onGoingGame.value.localPlayerMarker)
                         }
                         match.end()
                     }
