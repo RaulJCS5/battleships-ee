@@ -3,6 +3,14 @@ package isel.pdm.ee.battleship.game.domain
 
 const val BOARD_FIELD= "board"
 const val TURN_FIELD = "turn"
+const val FLEET_FIELD = "fleet"
+
+/**
+ * Represents a board. Instances are immutable.
+ * @property turn The next player to move
+ * @property tiles The board tiles
+ * @property ships The ships in the board
+ */
 data class Board(
     val turn: PlayerMarker = PlayerMarker.firstToMove,
     val tiles: MutableList<MutableList<PositionStateBoard>> =
@@ -18,6 +26,10 @@ data class Board(
         ),
     val ships: MutableList<Ship> = mutableListOf(),
 ) {
+    /**
+     * Fake constructor for testing purposes
+     * TODO: Remove this constructor
+     */
     init {
         ships.add(Ship(ShipType.CARRIER, Coordinate(0,0), "D"))
         ships.add(Ship(ShipType.BATTLESHIP, Coordinate(0,1), "D"))
@@ -26,10 +38,22 @@ data class Board(
         ships.add(Ship(ShipType.DESTROYER, Coordinate(0,4), "D"))
     }
 
+    /**
+     * Overloads the indexing operator
+     */
     operator fun get(at: Coordinate): PositionStateBoard = getMove(at)
-
+    /**
+     * Gets the move at the given coordinates.
+     * @param at the move's coordinates
+     * @return the [PositionStateBoard] instance that made the move
+     */
     fun getMove(at: Coordinate): PositionStateBoard = tiles[at.row][at.column]
-
+    /**
+     * Makes a move (A.K.A shoot) at the given coordinates and returns the new board instance.
+     * @param at the board's coordinate
+     * TODO: @throws IllegalArgumentException if the position is already occupied
+     * @return the new board instance
+     */
     fun makeMove(at: Coordinate): Board {
         return Board(
             turn = turn.other,
@@ -51,6 +75,9 @@ data class Board(
         )
     }
 
+    /**
+     * Converts this instance to a list of moves.
+     */
     fun toMovesList(): MutableList<PositionStateBoard?> = tiles.flatten().toMutableList()
     fun toDocumentContent() = mapOf(
         TURN_FIELD to turn.name,
@@ -73,6 +100,16 @@ data class Board(
     }
 
     companion object {
+        /**
+         * Converts a list of moves to a board instance.
+         * Converts a list of ships to a list of ships instance.
+         * Puts the ships on the board.
+         *
+         * @param valueOf the next player to move
+         * @param moves the moves list
+         * @param fleet the fleet list
+         * @return the new board instance
+         */
         fun fromMovesList(valueOf: PlayerMarker, moves: String, fleet: String): Board {
             val board = Board(
                 turn = valueOf,
@@ -112,8 +149,13 @@ data class Board(
             board.placeFleetOnBoard(ships)
             return board
         }
-
-        fun parseShipString(shipString: String): Ship? {
+        /**
+         * Parses a ship string into a [Ship] instance.
+         * @param shipString the ship string
+         * @return the [Ship] instance
+         * TODO: @throws IllegalArgumentException if the ship string is invalid
+         */
+        private fun parseShipString(shipString: String): Ship? {
             // Remove any extra parentheses and whitespace
             val cleanedString = shipString.trim('(', ')')
 
@@ -137,8 +179,13 @@ data class Board(
             }
             return null // Invalid shipString format
         }
-
-        fun parseShipListString(shipListString: String): MutableList<Ship> {
+        /**
+         * Parses a list of ship strings into a list of [Ship] instances.
+         * @param shipListString the list of ship strings
+         * @return the list of [Ship] instances
+         * TODO: @throws IllegalArgumentException if any of the ship strings are invalid
+         */
+        private fun parseShipListString(shipListString: String): MutableList<Ship> {
             // Remove square brackets and split the string into individual ship strings
             val shipStrings = shipListString.trim('[', ']').split("),(")
 
@@ -155,7 +202,11 @@ data class Board(
             return ships
         }
     }
-
+    /**
+     * Places the ships on the board.
+     * @param ships the list of ships
+     * TODO: @throws IllegalArgumentException if there is a ship collision
+     */
     fun placeFleetOnBoard(ships: MutableList<Ship>) {
         for (ship in ships) {
             val shipType = ship.shipType
@@ -173,7 +224,12 @@ data class Board(
             }
         }
     }
-
+    /**
+     * Gets the coordinates of a ship.
+     * @param ship the ship
+     * @return the list of coordinates with the ship's position and orientation applied
+     * TODO: @throws IllegalArgumentException if the ship orientation is invalid
+     */
     private fun getShipCoordinates(ship: Ship): List<Pair<Int, Int>> {
         val (startRow, startCol) = ship.coordinate
         val length = when (ship.orientation) {
@@ -214,16 +270,25 @@ data class Board(
 
 }
 
+// TODO: Implement the results of the game (win, lose, tie)
 fun isTied(): Boolean = false
 
 fun hasWon(playerMarker: PlayerMarker): Boolean = false
 
-
+/**
+ * Sum type used to describe board results occurring while the match is ongoing.
+ * [HasWinner] to signal that the game have a winner.
+ * [Tied] to signal that the game is tied.
+ * [OnGoing] to signal the game is still ongoing.
+ */
 open class BoardResult
 class HasWinner(val winner: PlayerMarker) : BoardResult()
 class Tied : BoardResult()
 class OnGoing : BoardResult()
 
+/**
+ * Gets the current result of the board.
+ */
 fun Board.getResult(): BoardResult = OnGoing()
     /*when {
         hasWon(PlayerMarker.PLAYER1) -> HasWinner(PlayerMarker.PLAYER1)

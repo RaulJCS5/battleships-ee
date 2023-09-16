@@ -44,6 +44,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * This function is called when the game is started and is responsible for subscribing to the game state updates.
      * @param localPlayer the local player
      * @param matching the matching
+     * @return the flow of game events
      */
     override fun startAndObserveGameEvents(localPlayer: PlayerInfo, matching: Matching): Flow<GameEvent> {
         // fake implementation
@@ -83,6 +84,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * @param localPlayerMarker the marker of the local player
      * @param gameId the id of the game
      * @param producerScope the producerScope
+     * @return the listenerRegistration
      */
     private fun subscribeGameStateUpdated(
         localPlayerMarker: PlayerMarker,
@@ -139,6 +141,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
                                 }
                                 game.quitGameBy != null -> {
                                     Log.v(TAG, "GameEnded")
+                                    // Need to update the other user quitGameBy field
                                     GameEnded(game, game.quitGameBy.other)
                                 }
                                 else -> {
@@ -177,15 +180,20 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     }
 
     /**
-     * This function gets the player marker of the local player
-     * @param game the game that is ended
-     * @param gameId the id of the game
+     * This function is called when the game is started
+     * @param localPlayer the local player
+     * @param matching the matching
+     * @return the player marker
      */
     private fun getPlayerMarker(localPlayer: PlayerInfo, matching: Matching): PlayerMarker {
         return if (localPlayer == matching.player1) PlayerMarker.firstToMove
         else PlayerMarker.firstToMove.other
     }
 
+    /**
+     * This function is called when the player makes a move
+     * @param at the coordinate of the move
+     */
     override suspend fun makeMove(at: Coordinate) {
         onGoingGame = checkNotNull(onGoingGame).also {
             Log.v(TAG, "makeMove")
@@ -194,7 +202,12 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
             updateGame(game.first, game.second)
         }
     }
-
+    /**
+     * This function is called when the timer is started
+     * @param time the time
+     * @param timeLimit the time limit
+     * @return the flow of time events
+     */
     override fun startTimer(time: Int, timeLimit: Int): Flow<TimeEvent> {
         return callbackFlow {
             try {
@@ -220,7 +233,11 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         }
     }
 
-
+    /**
+     * This function is called when the player updates the game
+     * @param game the game
+     * @param gameId the id of the game
+     */
     private suspend fun updateGame(game: Game, gameId: String) {
         try {
             Log.v(TAG, "updateGame $gameId")
@@ -241,6 +258,11 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
 
     /**
      * This function is called when the player quits the game
+     * TODO: check if the other player is notified
+     * TODO: In consequence of the player not being notified the other player can still make moves
+     * What is happening?
+     * TODO: Is that as soon as the the otherPlayerMarkerCollection is updated with quitGameBy corresponding to the localPlayerMarker and the game is ended,
+     * TODO: the playerMarkerCollection cant be notified and update the quitGameBy because the game already ended.
      */
     override suspend fun quitGame() {
         val currentOnGoingGame = onGoingGame

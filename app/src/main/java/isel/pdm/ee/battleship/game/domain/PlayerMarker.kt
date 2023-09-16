@@ -1,5 +1,8 @@
 package isel.pdm.ee.battleship.game.domain
 
+/**
+ * Enumeration type used to represent the game's players markers.
+ */
 enum class PlayerMarker {
 
     PLAYER1, PLAYER2;
