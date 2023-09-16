@@ -51,6 +51,17 @@ fun getTile(move: PositionStateBoard): Color {
         }
     }
 }
+fun getTileHideFleet(move: PositionStateBoard): Color {
+    return if (move.wasShoot) {
+        if (move.wasShip == true) {
+            Color.Red
+        } else {
+            Color.White
+        }
+    } else {
+        Color.Blue
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

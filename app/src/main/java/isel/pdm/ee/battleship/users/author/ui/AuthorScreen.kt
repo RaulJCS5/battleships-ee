@@ -2,6 +2,7 @@ package isel.pdm.ee.battleship.users.author.ui
 
 import android.net.Uri
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +32,7 @@ fun AuthorScreen(
     onSendEmailRequested: () -> Unit = { },
     onOpenUrlRequested: (Uri) -> Unit = { }
 ) {
+    val isDarkMode = isSystemInDarkTheme()
     BattleshipTheme() {
         Scaffold(
             topBar = {
@@ -56,22 +58,17 @@ fun AuthorScreen(
                     val socialLinks = listOf(
                         SocialInfo(
                             link = Uri.parse(state.author.github_http),
-                            imageId = R.drawable.ic_github
+                            imageId = if (isDarkMode) R.drawable.github_mark_white else R.drawable.github_mark
                         ),
                         SocialInfo(
                             link = Uri.parse(state.author.linkedin_http),
-                            imageId = R.drawable.ic_linkedin
+                            imageId = if (isDarkMode) R.drawable.in_white else R.drawable.in_blue
                         )
                     )
                     Socials(
                         socials = socialLinks,
                         onOpenUrlRequested = onOpenUrlRequested
                     )
-                }
-                Box(
-                    contentAlignment = Alignment.CenterEnd,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
                 }
             }
 

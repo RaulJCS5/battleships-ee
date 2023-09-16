@@ -31,26 +31,7 @@ fun ShowPlayerRankView(ranks: GameRankTotals) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = stringResource(id = R.string.app_user_id_label),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .padding(top = 8.dp, end = 8.dp),
-                )
-                Text(
-                    text = ranks.user.id.toString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, end = 8.dp),
-                )
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(id = R.string.app_username_label),
+                    text = stringResource(id = R.string.app_nick_label),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Start,
@@ -59,24 +40,6 @@ fun ShowPlayerRankView(ranks: GameRankTotals) {
                 )
                 Text(
                     text = ranks.user.username,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, end = 8.dp),
-                )
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(id = R.string.app_email_label),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .padding(top = 8.dp, end = 8.dp),
-                )
-                Text(
-                    text = ranks.user.email,
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Start,
                     modifier = Modifier

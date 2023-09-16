@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import isel.pdm.ee.battleship.DependenciesContainer
+import isel.pdm.ee.battleship.fleet.ui.FleetActivity
 import isel.pdm.ee.battleship.lobby.ui.LobbyActivity
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
 import isel.pdm.ee.battleship.users.listAuthors.ui.AuthorsListActivity
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
     private fun startGame() {
         if (repo.userInfo != null) {
-            LobbyActivity.navigate(this)
+            FleetActivity.navigate(this)
         } else
             PreferencesActivity.navigate(this)
     }

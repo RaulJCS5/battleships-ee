@@ -33,6 +33,10 @@
             android:exported="false">
         </activity>
         <activity
+            android:name=".fleet.ui.FleetActivity"
+            android:exported="false">
+        </activity>
+        <activity
             android:name=".game.ui.GameActivity"
             android:exported="false">
         </activity>

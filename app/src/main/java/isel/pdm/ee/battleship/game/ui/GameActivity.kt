@@ -27,7 +27,7 @@ class GameActivity: ComponentActivity() {
     private val viewModel by viewModels<GameScreenViewModel> {
         viewModelInit {
             val app = (application as DependenciesContainer)
-            GameScreenViewModel(app.match)
+            GameScreenViewModel(app.match, app.userInfoRepo)
         }
     }
 
@@ -67,26 +67,14 @@ class GameActivity: ComponentActivity() {
                 remainingTime = remainingTime,
                 timeLimit = timeLimit
             )
-            when(currentState){
-                MatchState.FINISHED -> {
-                    if (currentGame.quitGameBy != null) {
-                        MatchEndedDialog(
-                            localPLayerMarker = currentGame.localPlayerMarker,
-                            result = HasWinner(currentGame.quitGameBy!!.other),
-                            onDismissRequested = { finish() }
-                        )
-                        Log.v(TAG, "This player quit the game ${currentGame.quitGameBy}")
-                    } else {
-                        MatchEndedDialog(
-                            localPLayerMarker = currentGame.localPlayerMarker,
-                            result = currentGame.getResult(),
-                            onDismissRequested = { finish() }
-                        )
-                        Log.v(TAG, "Game finished")
-                    }
-                }
-                else -> {
-                }
+            when (currentState) {
+                //MatchState.STARTING -> StartingMatchDialog()
+                MatchState.FINISHED -> MatchEndedDialog(
+                    localPLayerMarker = currentGame.localPlayerMarker,
+                    result = currentGame.getResult(),
+                    onDismissRequested = { finish() }
+                )
+                else -> { }
             }
             if (currentGame.localPlayerMarker == currentGame.board.turn) {
                 viewModel.startTimer()
@@ -95,7 +83,7 @@ class GameActivity: ComponentActivity() {
         if (viewModel.state == MatchState.IDLE) {
             viewModel.startMatch(localPlayer, matching)
         }
-        onBackPressedDispatcher.addCallback {
+        onBackPressedDispatcher.addCallback(owner = this, enabled = true) {
             viewModel.quitGame()
             finish()
         }

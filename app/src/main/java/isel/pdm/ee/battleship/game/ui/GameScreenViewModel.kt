@@ -7,17 +7,21 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import isel.pdm.ee.battleship.TAG
+import isel.pdm.ee.battleship.TAG_MODEL
+import isel.pdm.ee.battleship.game.domain.BoardResult
 import isel.pdm.ee.battleship.game.domain.Coordinate
 import isel.pdm.ee.battleship.game.domain.Game
 import isel.pdm.ee.battleship.game.domain.GameEnded
 import isel.pdm.ee.battleship.game.domain.GameStarted
 import isel.pdm.ee.battleship.game.domain.Match
 import isel.pdm.ee.battleship.game.domain.OnGoing
+import isel.pdm.ee.battleship.game.domain.PlayerMarker
 import isel.pdm.ee.battleship.game.domain.TimeEnded
 import isel.pdm.ee.battleship.game.domain.TimeUpdated
 import isel.pdm.ee.battleship.game.domain.getResult
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
+import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +29,10 @@ import kotlinx.coroutines.launch
 
 enum class MatchState { IDLE, STARTING, STARTED, FINISHED }
 
-class GameScreenViewModel(private val match: Match) : ViewModel() {
+class GameScreenViewModel(
+    private val match: Match,
+    val userInfoRepo: UserInfoRepository,
+) : ViewModel() {
 
     val timeLimit: Int = 120 // 2 minutes / 120 seconds
 
@@ -41,34 +48,49 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
 
     private var timerJob: Job? = null
 
+    private var gameMonitor: Pair<Job, Matching>? = null
+
     fun makeMove(at: Coordinate): Job? =
-        if (state == MatchState.STARTED) {
-            viewModelScope.launch {
-                match.makeMove(at)
-                stopTimer()
+        if (gameMonitor != null) {
+            if (state == MatchState.STARTED) {
+                viewModelScope.launch {
+                    match.makeMove(at)
+                    stopTimer()
+                    _remainingTime.value = 0
+                }
+            } else {
+                Log.v(TAG, "No move")
+                null
             }
-        }
-        else {
-            Log.v(TAG, "No move")
+        } else {
+            Log.v(TAG, "No game, no move")
             null
         }
 
     fun quitGame(): Job? =
-        if (state == MatchState.STARTED)
-            viewModelScope.launch {
-                match.quitGame()
-                stopTimer()
+        if (gameMonitor != null) {
+            if (state == MatchState.STARTED)
+                viewModelScope.launch {
+                    //gameMonitor?.first?.cancel()
+                    gameMonitor = null
+                    match.quitGame()
+                    stopTimer()
+                }
+            else {
+                Log.v(TAG, "No quit game")
+                null
             }
-        else {
-            Log.v(TAG, "No quit game")
+        } else {
+            Log.v(TAG, "No game no quit game")
             null
         }
 
-    fun startMatch(localPlayer: PlayerInfo, matching: Matching) {
+    fun startMatch(localPlayer: PlayerInfo, matching: Matching) : Job? {
         if (state == MatchState.IDLE) {
             Log.v(TAG, "startMatch: $state")
             _state = MatchState.STARTING
-            viewModelScope.launch {
+            val localPlayerInfo = PlayerInfo(checkNotNull(userInfoRepo.userInfo))
+            val startAndObserveGameEventsJob = viewModelScope.launch {
                 // match.startAndObserveGameEvents(localPlayer, matching) subscription moment "I WANT"
                 // This executes because I enter the match and I throw a koroutine to start the game
                 // .collect{  } moment "HOW TO REACT"
@@ -77,6 +99,7 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                 // This is the moment where I say what to do with the element that arrived from the Flow
                 match.startAndObserveGameEvents(localPlayer, matching).collect {
                     _onGoingGame.value = it.game
+                    var winner: BoardResult? = null
                     _state = when (it) {
                         is GameStarted -> {
                             Log.v(TAG, "GameStarted 1")
@@ -89,6 +112,10 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                         else ->
                             if (it.game.getResult() !is OnGoing) {
                                 Log.v(TAG, "GameEnded 2")
+                                it.game.getResult().also { result ->
+                                    Log.v(TAG, "Winner: $result")
+                                    winner = result
+                                }
                                 MatchState.FINISHED
                             }
                             else {
@@ -96,48 +123,76 @@ class GameScreenViewModel(private val match: Match) : ViewModel() {
                                 MatchState.STARTED
                             }
                     }
-                    if (_state == MatchState.FINISHED)
+                    if (_state == MatchState.FINISHED) {
+                        var resultWinner:PlayerMarker? = null
+                        resultWinner = if (winner != null) {
+                            Log.v(TAG_MODEL, "Winner: ${BoardResult.getWinner(winner!!)}")
+                            BoardResult.getWinner(winner!!)
+                        }else{
+                            Log.v(TAG_MODEL, "Quit game quitGameBy: ${it.game.quitGameBy}")
+                            it.game.quitGameBy?.other
+                        }
+                        if (resultWinner != null) {
+                            match.saveGameAndUpdate(localPlayerInfo, resultWinner, onGoingGame.value.localPlayerMarker)
+                        }
                         match.end()
+                    }
                 }
             }
+            gameMonitor = Pair(startAndObserveGameEventsJob, matching)
+            return startAndObserveGameEventsJob
         }
         else {
             Log.v(TAG, "startMatch: $state")
-            null
+            return null
         }
     }
 
     fun startTimer() {
-        if (state == MatchState.STARTED) {
-            timerJob = viewModelScope.launch {
-                match.startTimer(_remainingTime.value, timeLimit).collect {
-                    when(it) {
-                        is TimeEnded -> {
-                            match.quitGame()
-                            _remainingTime.value = it.time
-                        }
-                        is TimeUpdated -> {
-                            _remainingTime.value = it.time
+        if (gameMonitor != null) {
+            if (state == MatchState.STARTED) {
+                timerJob = viewModelScope.launch {
+                    match.startTimer(_remainingTime.value, timeLimit).collect {
+                        when (it) {
+                            is TimeEnded -> {
+                                match.quitGame()
+                                stopTimer()
+                                //_remainingTime.value = timeLimit
+                            }
+
+                            is TimeUpdated -> {
+                                _remainingTime.value = it.time
+                            }
+
+                            else -> {
+                                Log.v(TAG, "No time")
+                            }
                         }
                     }
                 }
+            } else {
+                Log.v(TAG, "No start timer")
             }
         }
         else {
-            Log.v(TAG, "No start timer")
+            Log.v(TAG, "No game no start timer")
         }
     }
 
     private fun stopTimer() {
-        if (timerJob == null) {
-            Log.v(TAG, "No timer to stop")
-            return
+        if (gameMonitor != null) {
+            if (timerJob == null) {
+                Log.v(TAG, "No timer to stop")
+                return
+            } else {
+                //_remainingTime.value = 0
+                timerJob?.cancel()
+                timerJob = null
+                Log.v(TAG, "Timer stopped")
+            }
         }
         else {
-            _remainingTime.value = 0
-            timerJob?.cancel()
-            timerJob = null
-            Log.v(TAG, "Timer stopped")
+            Log.v(TAG, "No game no timer to stop")
         }
     }
 }
