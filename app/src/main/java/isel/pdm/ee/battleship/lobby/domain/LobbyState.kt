@@ -5,6 +5,10 @@ import kotlinx.coroutines.channels.ProducerScope
 
 /**
  * Sum type that characterizes the lobby state
+ *
+ * [InUse] when the local player is in the lobby
+ * [InUseWithFlow] when the local player is in the lobby and there is a flow to be closed
+ * [Idle] when the local player is not in the lobby
  */
 sealed class LobbyState
 

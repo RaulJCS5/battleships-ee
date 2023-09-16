@@ -9,6 +9,11 @@ import com.google.firebase.firestore.QuerySnapshot
 import isel.pdm.ee.battleship.lobby.domain.Idle
 import isel.pdm.ee.battleship.lobby.domain.InUse
 import isel.pdm.ee.battleship.lobby.domain.InUseWithFlow
+import isel.pdm.ee.battleship.lobby.domain.LOBBY
+import isel.pdm.ee.battleship.lobby.domain.MATCHING
+import isel.pdm.ee.battleship.lobby.domain.MATCHING_ID
+import isel.pdm.ee.battleship.lobby.domain.MOTO_FIELD
+import isel.pdm.ee.battleship.lobby.domain.NICK_FIELD
 import isel.pdm.ee.battleship.lobby.domain.Lobby
 import isel.pdm.ee.battleship.lobby.domain.LobbyEvent
 import isel.pdm.ee.battleship.lobby.domain.LobbyState
@@ -24,13 +29,9 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
-
-const val LOBBY = "lobby"
-const val MATCHING = "matching"
-const val NICK_FIELD = "nick"
-const val MOTO_FIELD = "moto"
-const val MATCHING_ID = "id"
-
+/**
+ * Implementation of the Game's lobby using Firebase's Firestore
+ */
 class LobbyFirebase(private val db: FirebaseFirestore) : Lobby {
     private var state: LobbyState = Idle
     override suspend fun getPlayers(): List<PlayerInfo> {
@@ -181,6 +182,11 @@ fun PlayerInfo.toDocumentContent() = mapOf(
     MATCHING_ID to id.toString()
 )
 
+/**
+ * This extension function is used to convert a [QueryDocumentSnapshot] into a [PlayerInfo] instance.
+ * @return a [PlayerInfo] instance
+ * @see QueryDocumentSnapshot
+ */
 fun QueryDocumentSnapshot.toPlayerInfo() =
     PlayerInfo(
         info = UserInfo(
@@ -189,7 +195,11 @@ fun QueryDocumentSnapshot.toPlayerInfo() =
         ),
         id = UUID.fromString(id),
     )
-
+/**
+ * This extension function is used to convert a [QuerySnapshot] into a list of [PlayerInfo] instances.
+ * @return a list of [PlayerInfo] instances
+ * @see QuerySnapshot
+ */
 fun QuerySnapshot.toPlayerList() = map { it.toPlayerInfo() }
 
 /**

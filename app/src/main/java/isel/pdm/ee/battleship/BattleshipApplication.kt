@@ -45,21 +45,38 @@ class BattleshipApplication : DependenciesContainer, Application() {
                 .build()
         }
     }
+    /**
+     * The real Firestore database is used for production.
+     */
     private val realFirestoreDb: FirebaseFirestore by lazy {
         Firebase.firestore
     }
+    /**
+     * The player service is used to access the player's information.
+     */
     override val playerService: IPlayerService by lazy {
         PlayerService()
     }
+    /**
+     * The user info repository is used to access the user's information.
+     */
     override val userInfoRepo: UserInfoRepository
         get() = UserInfoRepositorySharedPrefs(this)
 
+    /**
+     * The fake lobby is used for testing purposes.
+     */
     override val fakeLobby: Lobby
         get() = FakeLobby()
 
+    /**
+     * The lobby is used to access the lobby's information.
+     */
     override val lobbyFirebase: Lobby
         get() = LobbyFirebase(emulatedFirestoreDb)
-
+    /**
+     * The match is used to access the match's information.
+     */
     override val match: Match
         get() = MatchFirebase(emulatedFirestoreDb)
 }
