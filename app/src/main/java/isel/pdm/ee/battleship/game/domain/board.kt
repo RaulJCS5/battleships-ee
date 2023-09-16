@@ -231,7 +231,7 @@ data class Board(
      * TODO: @throws IllegalArgumentException if the ship orientation is invalid
      */
     private fun getShipCoordinates(ship: Ship): List<Pair<Int, Int>> {
-        val (startRow, startCol) = ship.coordinate
+        val (startRow, startCol) = ship.coordinate!!
         val length = when (ship.orientation) {
             "R" -> ship.shipType.size
             "L" -> ship.shipType.size

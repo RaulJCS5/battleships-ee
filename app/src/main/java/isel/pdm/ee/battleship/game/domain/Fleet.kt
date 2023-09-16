@@ -12,7 +12,7 @@ package isel.pdm.ee.battleship.game.domain
  */
 data class Ship(
     val shipType: ShipType,
-    val coordinate: Coordinate,
+    val coordinate: Coordinate?,
     val orientation: String,
     val isSunken: Boolean = false
 )
