@@ -299,9 +299,9 @@ fun Board.hasWon(playerMarker: PlayerMarker): Boolean {
  */
 open class BoardResult(winner: PlayerMarker? = null) {
     companion object {
-        fun getWinner(winner: BoardResult): String? {
+        fun getWinner(winner: BoardResult): PlayerMarker? {
             return when (winner) {
-                is HasWinner -> winner.winner.name
+                is HasWinner -> winner.winner
                 is Tied -> null
                 else -> null
             }

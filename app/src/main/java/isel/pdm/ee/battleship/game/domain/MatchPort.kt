@@ -68,6 +68,9 @@ interface Match {
      * Saves the game.
      * @param [localPlayer] the local player information
      */
-    suspend fun saveGameAndUpdate(localPlayer: PlayerInfo, resultWinner: String)
+    suspend fun saveGameAndUpdate(
+        localPlayer: PlayerInfo,
+        resultWinner: PlayerMarker
+    )
 }
 

@@ -28,22 +28,23 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+val PLAYER1: String = "player1"
+val PLAYER2: String = "player2"
+val QUIT_GAME_FIELD: String = "quitgame"
+val GAME_ID: String = "gameid"
+val WINNER_FIELD: String = "winner"
+val GAME_ID_LIST_FIELD: String = "gameidlist"
+val ONGOING: String = "ongoing"
+val SAVE_GAME: String = "savegame"
+val GAMES_FIELD: String = "games"
+var onGoingGame: Pair<Game, String>? = null
 /**
  * This class represents the match firebase
  * @property db the firebase firestore
  */
 class MatchFirebase(private val db: FirebaseFirestore) : Match {
 
-    private val PLAYER1: String = "player1"
-    private val PLAYER2: String = "player2"
-    private val QUIT_GAME_FIELD: String = "quitgame"
-    private val GAME_ID: String = "gameid"
-    private val WINNER_FIELD: String = "winner"
-    private val GAME_ID_LIST_FIELD: String = "gameidlist"
-    private val ONGOING: String = "ongoing"
-    private val SAVE_GAME: String = "savegame"
-    private val GAMES_FIELD: String = "games"
-    private var onGoingGame: Pair<Game, String>? = null
+
     /**
      * This function is called when the game is started and is responsible for subscribing to the game state updates.
      * @param localPlayer the local player
@@ -310,7 +311,10 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         }
     }
 
-    override suspend fun saveGameAndUpdate(localPlayer: PlayerInfo, resultWinner: String) {
+    override suspend fun saveGameAndUpdate(
+        localPlayer: PlayerInfo,
+        resultWinner: PlayerMarker
+    ) {
         val gameId = onGoingGame!!.second
         val gameDocRef = db.collection(SAVE_GAME).document(localPlayer.info.nick)
         val gamesCollection = gameDocRef.collection(gameId).document(GAMES_FIELD)
@@ -321,7 +325,8 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         if (userDocSnapshot.exists()) {
             // User exists, update their existing games
             val existingGames = (userDocSnapshot[GAME_ID_LIST_FIELD] as? List<HashMap<String, String>> ?: emptyList()).toMutableList()
-            existingGames += hashMapOf(GAME_ID to gameId, WINNER_FIELD to resultWinner) // Add the new game to the list of existing games
+
+            existingGames += hashMapOf(GAME_ID to gameId, WINNER_FIELD to resultWinner.name) // Add the new game to the list of existing games
 
             // Update the user document with the new game and winner field
             gameDocRef.update(

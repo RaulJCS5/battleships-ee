@@ -15,6 +15,7 @@ import isel.pdm.ee.battleship.game.domain.GameEnded
 import isel.pdm.ee.battleship.game.domain.GameStarted
 import isel.pdm.ee.battleship.game.domain.Match
 import isel.pdm.ee.battleship.game.domain.OnGoing
+import isel.pdm.ee.battleship.game.domain.PlayerMarker
 import isel.pdm.ee.battleship.game.domain.TimeEnded
 import isel.pdm.ee.battleship.game.domain.TimeUpdated
 import isel.pdm.ee.battleship.game.domain.getResult
@@ -123,13 +124,13 @@ class GameScreenViewModel(
                             }
                     }
                     if (_state == MatchState.FINISHED) {
-                        var resultWinner:String? = null
-                        if (winner != null) {
+                        var resultWinner:PlayerMarker? = null
+                        resultWinner = if (winner != null) {
                             Log.v(TAG_MODEL, "Winner: ${BoardResult.getWinner(winner!!)}")
-                            resultWinner = BoardResult.getWinner(winner!!)
+                            BoardResult.getWinner(winner!!)
                         }else{
                             Log.v(TAG_MODEL, "Quit game quitGameBy: ${it.game.quitGameBy}")
-                            resultWinner = it.game.quitGameBy?.other?.name
+                            it.game.quitGameBy?.other
                         }
                         if (resultWinner != null) {
                             match.saveGameAndUpdate(localPlayerInfo, resultWinner)

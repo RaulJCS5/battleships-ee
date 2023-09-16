@@ -55,7 +55,7 @@ class BattleshipApplication : DependenciesContainer, Application() {
      * The player service is used to access the player's information.
      */
     override val playerService: IPlayerService by lazy {
-        PlayerService()
+        PlayerService(emulatedFirestoreDb)
     }
     /**
      * The user info repository is used to access the user's information.

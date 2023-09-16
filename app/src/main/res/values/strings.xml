@@ -25,7 +25,7 @@
     <string name="activity_info_no_suitable_app">Could not find a suitable application</string>
     <string name="top_bar_go_home">Go to home</string>
     <string name="app_user_id_label">User id:</string>
-    <string name="app_username_label">UserName:</string>
+    <string name="app_nick_label">Nick:</string>
     <string name="app_email_label">Email:</string>
     <string name="app_ranking_played_games_label">Played games:</string>
     <string name="app_ranking_win_games_label">Win games:</string>
