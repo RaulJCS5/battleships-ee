@@ -1,0 +1,4 @@
+TODO: 
+makeMove if no move no reset timer 
+overlapping fleets
+it cleans the board if the user put a fleet out of board
