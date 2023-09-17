@@ -43,7 +43,7 @@ class FleetViewModel(
                 listListMarker?.mapIndexed { row, listMarker ->
                     if (it.orientation.equals("U")) {
                         for (i in 0..shipSize) {
-                            if (row == at.row + i) {
+                            if (row == at.row - i) {
                                 listMarker[at.column] = PositionStateBoard(at,
                                     wasShoot = false,
                                     wasShip = true,
@@ -54,7 +54,7 @@ class FleetViewModel(
                         }
                     } else if (it.orientation.equals("D")) {
                         for (i in 0..shipSize) {
-                            if (row == at.row - i) {
+                            if (row == at.row + i) {
                                 listMarker[at.column] = PositionStateBoard(at,
                                     wasShoot = false,
                                     wasShip = true,
@@ -66,7 +66,7 @@ class FleetViewModel(
                     } else if (it.orientation.equals("L")) {
                         for (i in 0..shipSize) {
                             if (row == at.row) {
-                                listMarker[at.column + i] = PositionStateBoard(at,
+                                listMarker[at.column - i] = PositionStateBoard(at,
                                     wasShoot = false,
                                     wasShip = true,
                                     null,
@@ -77,7 +77,7 @@ class FleetViewModel(
                     } else if (it.orientation.equals("R")) {
                         for (i in 0..shipSize) {
                             if (row == at.row) {
-                                listMarker[at.column - i] = PositionStateBoard(at,
+                                listMarker[at.column + i] = PositionStateBoard(at,
                                     wasShoot = false,
                                     wasShip = true,
                                     null,

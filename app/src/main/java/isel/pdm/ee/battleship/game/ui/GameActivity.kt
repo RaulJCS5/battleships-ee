@@ -12,11 +12,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import isel.pdm.ee.battleship.DependenciesContainer
 import isel.pdm.ee.battleship.R
-import isel.pdm.ee.battleship.TAG
-import isel.pdm.ee.battleship.game.domain.HasWinner
+import isel.pdm.ee.battleship.TAG_MODEL
+import isel.pdm.ee.battleship.game.domain.Coordinate
+import isel.pdm.ee.battleship.game.domain.Ship
+import isel.pdm.ee.battleship.game.domain.ShipType
 import isel.pdm.ee.battleship.game.domain.getResult
 import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
+import isel.pdm.ee.battleship.lobby.ui.FleetInfo
+import isel.pdm.ee.battleship.lobby.ui.FleetInfoParcelable
+import isel.pdm.ee.battleship.lobby.ui.convertFleetInfoParcelableToMutableListShip
 import isel.pdm.ee.battleship.preferences.domain.UserInfo
 
 import isel.pdm.ee.battleship.utils.viewModelInit
@@ -33,11 +38,18 @@ class GameActivity: ComponentActivity() {
 
     companion object {
         const val MATCH_INFO_EXTRA = "MATCH_INFO_EXTRA"
-        fun navigate(origin: Context, localPlayer: PlayerInfo, matching: Matching) {
+        const val FLEET_INFO_EXTRA = "FLEET_INFO_EXTRA"
+        fun navigate(
+            origin: Context,
+            localPlayer: PlayerInfo,
+            matching: Matching,
+            mutableListShip: MutableList<Ship>
+        ) {
             with(origin) {
                 startActivity(
                     Intent(this, GameActivity::class.java).also {
                         it.putExtra(MATCH_INFO_EXTRA, MatchInfo(localPlayer, matching))
+                        it.putExtra(FLEET_INFO_EXTRA, FleetInfo(mutableListShip))
                     }
                 )
             }
@@ -55,6 +67,7 @@ class GameActivity: ComponentActivity() {
             val remainingTime by viewModel.remainingTime.collectAsState()
             val timeLimit = viewModel.timeLimit
             val currentState = viewModel.state
+            Log.v(TAG_MODEL, "Fleet info $mutableListShip")
             val title = when (currentState) {
                 MatchState.STARTING -> R.string.game_screen_starting
                 MatchState.IDLE -> R.string.game_screen_idle
@@ -93,6 +106,16 @@ class GameActivity: ComponentActivity() {
             intent.getParcelableExtra(MATCH_INFO_EXTRA, MatchInfoParcelable::class.java)
         checkNotNull(info) { "Missing match info" }
     }
+    private val fleetInfoParcelable: FleetInfoParcelable by lazy {
+        val info =
+            intent.getParcelableExtra(FLEET_INFO_EXTRA, FleetInfoParcelable::class.java)
+        checkNotNull(info) { "Missing fleet info" }
+    }
+
+    private val mutableListShip : MutableList<Ship> by lazy {
+        convertFleetInfoParcelableToMutableListShip(fleetInfoParcelable)
+    }
+
     val localPlayer by lazy {
         PlayerInfo(
             id = UUID.fromString(matchInfoParcelable.localPlayerId),

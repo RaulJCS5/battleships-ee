@@ -21,11 +21,11 @@ import isel.pdm.ee.battleship.game.domain.Coordinate
 import isel.pdm.ee.battleship.game.domain.Ship
 import isel.pdm.ee.battleship.game.domain.ShipType
 import isel.pdm.ee.battleship.game.ui.GameActivity
+import isel.pdm.ee.battleship.game.ui.GameActivity.Companion.FLEET_INFO_EXTRA
 import isel.pdm.ee.battleship.preferences.ui.PreferencesActivity
 import isel.pdm.ee.battleship.utils.viewModelInit
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import java.util.UUID
 
 /**
  * The screen used to display the list of players in the lobby, that is, available to play.
@@ -40,7 +40,6 @@ class LobbyActivity : ComponentActivity() {
     }
 
     companion object {
-        const val FLEET_INFO_EXTRA = "FLEET_INFO_EXTRA"
         fun navigate(origin: Context, mutableList: MutableList<Ship>) {
             with(origin) {
                 startActivity(
@@ -56,7 +55,6 @@ class LobbyActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val players by viewModel.players.collectAsState()
-            Log.v(TAG_MODEL, "Fleet info $fleetInfo")
             LobbyScreen(
                 state = LobbyScreenState(players),
                 onPlayerSelected = { player -> viewModel.sendMatching(player) },
@@ -76,7 +74,8 @@ class LobbyActivity : ComponentActivity() {
                             GameActivity.navigate(
                                 origin = this@LobbyActivity,
                                 localPlayer = it.localPlayer,
-                                matching = it.matching
+                                matching = it.matching,
+                                mutableListShip = mutableListShip
                             )
                         }
                     }
@@ -89,42 +88,41 @@ class LobbyActivity : ComponentActivity() {
 
     }
 
-    @Suppress("deprecation")
-    private val fleetInfo: FleetInfo by lazy {
+    private val fleetInfoParcelable: FleetInfoParcelable by lazy {
         val info =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                intent.getParcelableExtra(FLEET_INFO_EXTRA, FleetInfo::class.java)
-            else
-                intent.getParcelableExtra(FLEET_INFO_EXTRA)
+            intent.getParcelableExtra(FLEET_INFO_EXTRA, FleetInfoParcelable::class.java)
 
         checkNotNull(info)
     }
 
     private val mutableListShip : MutableList<Ship> by lazy {
-        fleetInfo.localShipDtoMutableList?.map {
-            Ship(
-                shipType = ShipType.valueOf(it.shipType.nameType),
-                coordinate = it.coordinate?.let { coordinate ->
-                    Coordinate(
-                        row = coordinate.row,
-                        column = coordinate.column
-                    )
-                },
-                orientation = it.orientation,
-                isSunken = it.isSunken
-            )
-        }?.toMutableList() ?: mutableListOf()
+        convertFleetInfoParcelableToMutableListShip(fleetInfoParcelable)
     }
 
 }
 
+fun convertFleetInfoParcelableToMutableListShip(fleetInfoParcelable: FleetInfoParcelable): MutableList<Ship> =
+    fleetInfoParcelable.localShipDtoMutableList?.map {
+        Ship(
+            shipType = ShipType.valueOf(it.shipType.nameType),
+            coordinate = it.coordinate?.let { coordinate ->
+                Coordinate(
+                    row = coordinate.row,
+                    column = coordinate.column
+                )
+            },
+            orientation = it.orientation,
+            isSunken = it.isSunken
+        )
+    }?.toMutableList() ?: mutableListOf()
+
 @Parcelize
-internal data class FleetInfo(
+data class FleetInfoParcelable(
     val localShipDtoMutableList: MutableList<LocalShipDto>?=null
 ) : Parcelable
 
-internal fun FleetInfo(shipMutableList: MutableList<Ship>): FleetInfo {
-    return FleetInfo(
+fun FleetInfo(shipMutableList: MutableList<Ship>): FleetInfoParcelable {
+    return FleetInfoParcelable(
         localShipDtoMutableList = shipMutableList.map {
             LocalShipDto(
                 shipType = LocalShipTypeDto.valueOf(it.shipType.name),
