@@ -25,7 +25,8 @@ fun BoardView(
     board: Board,
     onTileSelected: (at: Coordinate) -> Unit,
     enabled: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fleetOrGame:Boolean
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -43,6 +44,7 @@ fun BoardView(
                         enabled = enabled,
                         modifier = Modifier.weight(weight = 1.0f, fill = true),
                         onSelected = { onTileSelected(at) },
+                        fleetOrGame = fleetOrGame
                     )
                     if (column != BOARD_SIDE - 1) { VerticalSeparator() }
                 }
@@ -74,5 +76,5 @@ private fun VerticalSeparator() {
 @Composable
 private fun BoardViewPreview() {
     val game = Game()
-    BoardView(board = game.board, onTileSelected = { }, enabled = true)
+    BoardView(board = game.board, onTileSelected = { }, enabled = true, fleetOrGame = true)
 }

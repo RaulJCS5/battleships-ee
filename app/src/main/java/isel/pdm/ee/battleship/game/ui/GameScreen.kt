@@ -101,7 +101,8 @@ fun GameScreen(
                     modifier = Modifier
                         .padding(16.dp)
                         .weight(1.0f, true)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    fleetOrGame = false
                 )
                 Button(
                     onClick = onQuitGameRequested,

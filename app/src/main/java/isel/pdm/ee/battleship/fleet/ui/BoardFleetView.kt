@@ -18,6 +18,7 @@ fun BoardFleetView(
             onPositionDefineFleet(it)
         },
         enabled = true,
-        modifier = modifier
+        modifier = modifier,
+        fleetOrGame = true
     )
 }

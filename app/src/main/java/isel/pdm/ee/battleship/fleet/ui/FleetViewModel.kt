@@ -18,85 +18,99 @@ class FleetViewModel(
     val userInfoRepo: UserInfoRepository
 ) : ViewModel(){
     fun deleteAll() {
-        _allShipsAndLayouts = AllShips().shipList
-        _fleetBoard = Result.success(Board())
+        try {
+            _allShipsAndLayouts = AllShips().shipList
+            _fleetBoard = Result.success(Board())
+        }catch (e:Exception){
+            _allShipsAndLayouts = Result.failure(e)
+            _fleetBoard = Result.failure(e)
+        }
+
     }
 
     fun setShipLayout(ship: String, layout: String) {
-        val updated = _allShipsAndLayouts?.getOrNull()?.map {
-            if (it.shipType.name == ship&&it.coordinate==null) {
-                it.copy(orientation = layout)
-            } else {
-                it
+        try {
+            val updated = _allShipsAndLayouts?.getOrNull()?.map {
+                if (it.shipType.name == ship&&it.coordinate==null) {
+                    it.copy(orientation = layout)
+                } else {
+                    it
+                }
             }
+            if (updated!=null)
+                _allShipsAndLayouts = Result.success(updated.toMutableList())
+        }catch (e:Exception){
+            _allShipsAndLayouts = Result.failure(e)
         }
-        if (updated!=null)
-            _allShipsAndLayouts = Result.success(updated.toMutableList())
     }
 
     fun updateFleetBoard(at: Coordinate) {
-        val localPlayerUpdate = PlayerInfo(checkNotNull(userInfoRepo.userInfo))
-        val listListMarker = fleetBoard?.getOrNull()?.tiles
-        allShipsAndLayouts?.getOrNull()?.map {
-            if (it.coordinate == null) {
-                val shipSize = getSizeByName(it.shipType.name)-1
-                listListMarker?.mapIndexed { row, listMarker ->
-                    if (it.orientation.equals("U")) {
-                        for (i in 0..shipSize) {
-                            if (row == at.row - i) {
-                                listMarker[at.column] = PositionStateBoard(at,
-                                    wasShoot = false,
-                                    wasShip = true,
-                                    null,
-                                    null
-                                )
+        try {
+            val localPlayerUpdate = PlayerInfo(checkNotNull(userInfoRepo.userInfo))
+            val listListMarker = fleetBoard?.getOrNull()?.tiles
+            allShipsAndLayouts?.getOrNull()?.map {
+                if (it.coordinate == null) {
+                    val shipSize = getSizeByName(it.shipType.name)-1
+                    listListMarker?.mapIndexed { row, listMarker ->
+                        if (it.orientation.equals("U")) {
+                            for (i in 0..shipSize) {
+                                if (row == at.row - i) {
+                                    listMarker[at.column] = PositionStateBoard(at,
+                                        wasShoot = false,
+                                        wasShip = true,
+                                        null,
+                                        null
+                                    )
+                                }
                             }
-                        }
-                    } else if (it.orientation.equals("D")) {
-                        for (i in 0..shipSize) {
-                            if (row == at.row + i) {
-                                listMarker[at.column] = PositionStateBoard(at,
-                                    wasShoot = false,
-                                    wasShip = true,
-                                    null,
-                                    null
-                                )
+                        } else if (it.orientation.equals("D")) {
+                            for (i in 0..shipSize) {
+                                if (row == at.row + i) {
+                                    listMarker[at.column] = PositionStateBoard(at,
+                                        wasShoot = false,
+                                        wasShip = true,
+                                        null,
+                                        null
+                                    )
+                                }
                             }
-                        }
-                    } else if (it.orientation.equals("L")) {
-                        for (i in 0..shipSize) {
-                            if (row == at.row) {
-                                listMarker[at.column - i] = PositionStateBoard(at,
-                                    wasShoot = false,
-                                    wasShip = true,
-                                    null,
-                                    null
-                                )
+                        } else if (it.orientation.equals("L")) {
+                            for (i in 0..shipSize) {
+                                if (row == at.row) {
+                                    listMarker[at.column - i] = PositionStateBoard(at,
+                                        wasShoot = false,
+                                        wasShip = true,
+                                        null,
+                                        null
+                                    )
+                                }
                             }
-                        }
-                    } else if (it.orientation.equals("R")) {
-                        for (i in 0..shipSize) {
-                            if (row == at.row) {
-                                listMarker[at.column + i] = PositionStateBoard(at,
-                                    wasShoot = false,
-                                    wasShip = true,
-                                    null,
-                                    null
-                                )
+                        } else if (it.orientation.equals("R")) {
+                            for (i in 0..shipSize) {
+                                if (row == at.row) {
+                                    listMarker[at.column + i] = PositionStateBoard(at,
+                                        wasShoot = false,
+                                        wasShip = true,
+                                        null,
+                                        null
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        setShipLayoutReferenceLayout(at)
-        if (listListMarker != null) {
-            _fleetBoard = Result.success(
-                Board(
-                    tiles = listListMarker,
-                    //ships = allShipsAndLayouts?.getOrNull()?.filter { it.referencePoint != null }
+            setShipLayoutReferenceLayout(at)
+            if (listListMarker != null) {
+                _fleetBoard = Result.success(
+                    Board(
+                        tiles = listListMarker,
+                        //ships = allShipsAndLayouts?.getOrNull()?.filter { it.referencePoint != null }
+                    )
                 )
-            )
+            }
+        }catch (e:Exception){
+            _fleetBoard = Result.failure(e)
         }
     }
     private fun setShipLayoutReferenceLayout(at:Coordinate) {

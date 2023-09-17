@@ -22,10 +22,11 @@ fun TileView(
     move: PositionStateBoard?,
     enabled: Boolean,
     onSelected: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fleetOrGame:Boolean
 ) {
     if (move != null) {
-        val marker = getTileHideFleet(move)
+        val marker = if (fleetOrGame) getTile(move) else getTileHideFleet(move)
         Box(modifier = modifier
             .background(marker)
             .fillMaxSize(1.0f)
@@ -76,7 +77,8 @@ private fun TileViewEmptyPreview() {
                 shipLayout = null
             ),
             enabled = true,
-            onSelected = { }
+            onSelected = { },
+            fleetOrGame = false
         )
     }
 }
