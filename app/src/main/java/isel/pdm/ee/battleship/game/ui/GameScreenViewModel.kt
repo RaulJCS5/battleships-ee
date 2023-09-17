@@ -66,7 +66,8 @@ class GameScreenViewModel(
         if (gameMonitor != null) {
             if (state == MatchState.STARTED) {
                 viewModelScope.launch {
-                    //match.makeMove(at)
+                    Log.v(TAG_MODEL, "hashFleetBoard: $hashFleetBoard")
+                    match.makeMove(at)
                     stopTimer()
                     _remainingTime.value = 0
                 }

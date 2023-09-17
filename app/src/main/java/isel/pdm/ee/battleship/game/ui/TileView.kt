@@ -25,7 +25,7 @@ fun TileView(
     modifier: Modifier = Modifier
 ) {
     if (move != null) {
-        val marker = getTile(move)
+        val marker = getTileHideFleet(move)
         Box(modifier = modifier
             .background(marker)
             .fillMaxSize(1.0f)

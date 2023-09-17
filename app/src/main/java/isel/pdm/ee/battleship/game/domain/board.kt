@@ -54,7 +54,7 @@ data class Board(
      * TODO: @throws IllegalArgumentException if the position is already occupied
      * @return the new board instance
      */
-    fun makeMove(at: Coordinate): Board {
+    fun makeMove(at: Coordinate, mutableFleetList: MutableList<Ship>): Board {
         return Board(
             turn = turn.other,
             tiles = tiles.mapIndexed { row, elem ->
@@ -71,7 +71,8 @@ data class Board(
                     }
                 else
                     elem
-            }.toMutableList()
+            }.toMutableList(),
+            ships = mutableFleetList
         )
     }
 
@@ -185,7 +186,7 @@ data class Board(
          * @return the list of [Ship] instances
          * TODO: @throws IllegalArgumentException if any of the ship strings are invalid
          */
-        private fun parseShipListString(shipListString: String): MutableList<Ship> {
+        fun parseShipListString(shipListString: String): MutableList<Ship> {
             // Remove square brackets and split the string into individual ship strings
             val shipStrings = shipListString.trim('[', ']').split("),(")
 

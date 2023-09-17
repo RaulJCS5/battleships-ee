@@ -18,9 +18,9 @@ data class Game(
  * @return the new [Game] instance
  * TODO: @throws IllegalStateException if its an invalid move, either because its not the local player's turn or the move cannot be made on that location
  */
-fun Game.makeMove(at: Coordinate): Game {
-    check(localPlayerMarker == board.turn)
-    return copy(board = board.makeMove(at))
+fun Game.makeMove(at: Coordinate, mutableFleetList: MutableList<Ship>?): Game {
+    check(localPlayerMarker == board.turn && mutableFleetList != null)
+    return copy(board = board.makeMove(at, mutableFleetList))
 }
 
 /**

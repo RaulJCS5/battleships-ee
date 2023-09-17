@@ -74,7 +74,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
             val gameId = matching.player1.id.toString()
             var gameSubscription: ListenerRegistration? = null
             try {
-                Log.v(TAG_MODEL, "Fleet info $hashFleetBoard")
+                // Log.v(TAG_MODEL, "Fleet info $hashFleetBoard")
                 postGameStarted(game, gameId, playerMarker)
                 gameSubscription = subscribeGameStateUpdated(
                     localPlayerMarker = game.localPlayerMarker,
@@ -207,13 +207,50 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * @param at the coordinate of the move
      */
     override suspend fun makeMove(at: Coordinate) {
-        onGoingGame = checkNotNull(onGoingGame).also {
+        onGoingGame = checkNotNull(onGoingGame).also { itPairGame ->
             Log.v(TAG, "makeMove")
-            val game = it.copy(first = it.first.makeMove(at))
-            Log.v(TAG, "makeMove game $game")
-            updateGame(game.first, game.second)
+            var mutableFleetList: MutableList<Ship>? = null
+            try {
+                getShipsFromDocument(itPairGame.first, itPairGame.second) { fleetList ->
+                    if (fleetList != null) {
+                        Log.v(TAG_MODEL, "Got fleet list: $fleetList")
+                        mutableFleetList = fleetList
+                    } else {
+                        Log.v(TAG_MODEL, "Error or no data")
+                    }
+                }
+                val game = itPairGame.copy(first = itPairGame.first.makeMove(at, mutableFleetList))
+                Log.v(TAG_MODEL, "makeMove game $game")
+                updateGame(game.first, game.second)
+            }catch (e: Exception){
+                Log.e(TAG, "makeMove Exception: ${e.message}", e)
+            }
         }
     }
+
+    private suspend fun getShipsFromDocument(
+        game: Game,
+        gameId: String,
+        onComplete: (MutableList<Ship>?) -> Unit
+    ) {
+        val ongoingCollection = db.collection(ONGOING).document(gameId)
+        val playerMarkerCollection = ongoingCollection.collection(game.localPlayerMarker.name.lowercase())
+
+        playerMarkerCollection.document(BOARD_FIELD).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val fleetInfoString = documentSnapshot.getString(FLEET_FIELD)
+                val mutableListShip = fleetInfoString?.let { Board.parseShipListString(it) }
+                onComplete(mutableListShip) // Call onComplete with the result
+            }
+            .addOnFailureListener { e ->
+                Log.v(TAG, "Error ${e.message}")
+                onComplete(null) // Call onComplete with null in case of an error
+            }
+            .await()
+    }
+
+
+
     /**
      * This function is called when the timer is started
      * @param time the time
