@@ -24,19 +24,19 @@ data class Board(
                     )
                 }) }
         ),
-    val ships: MutableList<Ship> = mutableListOf(),
+    val ships: MutableList<Ship>? = null,
 ) {
     /**
      * Fake constructor for testing purposes
      * TODO: Remove this constructor
      */
-    init {
+    /*init {
         ships.add(Ship(ShipType.CARRIER, Coordinate(0,0), "D"))
         ships.add(Ship(ShipType.BATTLESHIP, Coordinate(0,1), "D"))
         ships.add(Ship(ShipType.CRUISER, Coordinate(0,2), "D"))
         ships.add(Ship(ShipType.SUBMARINE, Coordinate(0,3), "D"))
         ships.add(Ship(ShipType.DESTROYER, Coordinate(0,4), "D"))
-    }
+    }*/
 
     /**
      * Overloads the indexing operator
@@ -92,11 +92,11 @@ data class Board(
     )
     private fun toShipsListString(): String {
         // Convert each ship to its string representation
-        val shipStrings = ships.map { ship ->
+        val shipStrings = ships?.map { ship ->
             "(${ship.shipType},${ship.coordinate},${ship.orientation})"
         }
         // Join the ship strings with commas and encapsulate them with square brackets
-        return "[" + shipStrings.joinToString(",") + "]"
+        return "[" + (shipStrings?.joinToString(",") ?: "") + "]"
     }
 
     companion object {

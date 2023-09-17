@@ -68,7 +68,7 @@ fun GameScreen(
                 }
                 Text(
                     text = stringResource(id = titleTextId),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.displayMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.testTag(GameScreenTitleTag)
                 )

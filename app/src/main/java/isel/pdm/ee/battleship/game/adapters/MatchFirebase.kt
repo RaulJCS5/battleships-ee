@@ -16,6 +16,7 @@ import isel.pdm.ee.battleship.game.domain.GameStarted
 import isel.pdm.ee.battleship.game.domain.Match
 import isel.pdm.ee.battleship.game.domain.MoveMade
 import isel.pdm.ee.battleship.game.domain.PlayerMarker
+import isel.pdm.ee.battleship.game.domain.Ship
 import isel.pdm.ee.battleship.game.domain.TURN_FIELD
 import isel.pdm.ee.battleship.game.domain.TimeEnded
 import isel.pdm.ee.battleship.game.domain.TimeEvent
@@ -53,22 +54,28 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * @param matching the matching
      * @return the flow of game events
      */
-    override fun startAndObserveGameEvents(localPlayer: PlayerInfo, matching: Matching): Flow<GameEvent> {
+    override fun startAndObserveGameEvents(
+        localPlayer: PlayerInfo,
+        matching: Matching,
+        hashFleetBoard: HashMap<String, MutableList<Ship>>
+    ): Flow<GameEvent> {
         // fake implementation
         Log.v(TAG, "start")
         check(onGoingGame == null)
         return callbackFlow {
             Log.v(TAG, "start callbackFlow")
+            val playerMarker = getPlayerMarker(localPlayer, matching)
             val game = Game(
                 localPlayerMarker = getPlayerMarker(localPlayer, matching),
-                board = Board()
+                board = Board(
+                    ships = hashFleetBoard[playerMarker.name]
+                )
                 )
             val gameId = matching.player1.id.toString()
             var gameSubscription: ListenerRegistration? = null
             try {
-                if (localPlayer == matching.player2) {
-                    postGameStarted(game, gameId)
-                }
+                Log.v(TAG_MODEL, "Fleet info $hashFleetBoard")
+                postGameStarted(game, gameId, playerMarker)
                 gameSubscription = subscribeGameStateUpdated(
                     localPlayerMarker = game.localPlayerMarker,
                     gameId = gameId,
@@ -172,13 +179,11 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
      * @param game the game that is started
      * @param gameId the id of the game
      */
-    private suspend fun postGameStarted(game: Game, gameId: String) {
+    private suspend fun postGameStarted(game: Game, gameId: String, playerMarker: PlayerMarker) {
         try {
             val gameDocRef = db.collection(ONGOING).document(gameId)
-            val player1BoardRef = gameDocRef.collection(PLAYER1).document(BOARD_FIELD)
-            val player2BoardRef = gameDocRef.collection(PLAYER2).document(BOARD_FIELD)
-            player1BoardRef.set(game.board.toDocumentContent()).await()
-            player2BoardRef.set(game.board.toDocumentContent()).await()
+            val playerBoardRef = gameDocRef.collection(playerMarker.name.lowercase()).document(BOARD_FIELD)
+            playerBoardRef.set(game.board.toDocumentContent()).await()
             println("Game state saved to Firestore successfully.")
         }
         catch (e: Exception) {

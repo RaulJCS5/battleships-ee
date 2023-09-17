@@ -48,6 +48,12 @@ class GameScreenViewModel(
     private val _fleetInfo = MutableStateFlow<MutableList<Ship>>(mutableListOf<Ship>())
     val fleetInfo = _fleetInfo.asStateFlow()
 
+    private var _hashFleetBoard by mutableStateOf<Result<HashMap<String,MutableList<Ship>>>?>(
+            Result.success(hashMapOf<String,MutableList<Ship>>())
+    )
+    val hashFleetBoard: Result<HashMap<String,MutableList<Ship>>>?
+        get() = _hashFleetBoard
+
     private var _state by mutableStateOf(MatchState.IDLE)
     val state: MatchState
         get() = _state
@@ -103,45 +109,48 @@ class GameScreenViewModel(
                 // This executes because a element arrived to the flow and I want to react to it
                 // This runs as many times as things are pushed to the flow
                 // This is the moment where I say what to do with the element that arrived from the Flow
-                match.startAndObserveGameEvents(localPlayer, matching).collect {
-                    _onGoingGame.value = it.game
-                    var winner: BoardResult? = null
-                    _state = when (it) {
-                        is GameStarted -> {
-                            Log.v(TAG, "GameStarted 1")
-                            MatchState.STARTED
-                        }
-                        is GameEnded -> {
-                            Log.v(TAG, "GameEnded 1")
-                            MatchState.FINISHED
-                        }
-                        else ->
-                            if (it.game.getResult() !is OnGoing) {
-                                Log.v(TAG, "GameEnded 2")
-                                it.game.getResult().also { result ->
-                                    Log.v(TAG, "Winner: $result")
-                                    winner = result
-                                }
-                                MatchState.FINISHED
-                            }
-                            else {
-                                Log.v(TAG, "GameStarted 2")
+                _hashFleetBoard?.getOrNull()?.let {
+                    match.startAndObserveGameEvents(localPlayer, matching, it).collect {
+                        _onGoingGame.value = it.game
+                        var winner: BoardResult? = null
+                        _state = when (it) {
+                            is GameStarted -> {
+                                Log.v(TAG, "GameStarted 1")
                                 MatchState.STARTED
                             }
-                    }
-                    if (_state == MatchState.FINISHED) {
-                        var resultWinner:PlayerMarker? = null
-                        resultWinner = if (winner != null) {
-                            //Log.v(TAG_MODEL, "Winner: ${BoardResult.getWinner(winner!!)}")
-                            BoardResult.getWinner(winner!!)
-                        }else{
-                            //Log.v(TAG_MODEL, "Quit game quitGameBy: ${it.game.quitGameBy}")
-                            it.game.quitGameBy?.other
+
+                            is GameEnded -> {
+                                Log.v(TAG, "GameEnded 1")
+                                MatchState.FINISHED
+                            }
+
+                            else ->
+                                if (it.game.getResult() !is OnGoing) {
+                                    Log.v(TAG, "GameEnded 2")
+                                    it.game.getResult().also { result ->
+                                        Log.v(TAG, "Winner: $result")
+                                        winner = result
+                                    }
+                                    MatchState.FINISHED
+                                } else {
+                                    Log.v(TAG, "GameStarted 2")
+                                    MatchState.STARTED
+                                }
                         }
-                        if (resultWinner != null) {
-                            match.saveGameAndUpdate(localPlayerInfo, resultWinner, onGoingGame.value.localPlayerMarker)
+                        if (_state == MatchState.FINISHED) {
+                            var resultWinner:PlayerMarker? = null
+                            resultWinner = if (winner != null) {
+                                //Log.v(TAG_MODEL, "Winner: ${BoardResult.getWinner(winner!!)}")
+                                BoardResult.getWinner(winner!!)
+                            }else{
+                                //Log.v(TAG_MODEL, "Quit game quitGameBy: ${it.game.quitGameBy}")
+                                it.game.quitGameBy?.other
+                            }
+                            if (resultWinner != null) {
+                                match.saveGameAndUpdate(localPlayerInfo, resultWinner, onGoingGame.value.localPlayerMarker)
+                            }
+                            match.end()
                         }
-                        match.end()
                     }
                 }
             }

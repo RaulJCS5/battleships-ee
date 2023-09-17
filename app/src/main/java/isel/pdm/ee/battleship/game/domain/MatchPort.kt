@@ -40,7 +40,11 @@ interface Match {
      * @return the flow of game state change events, expressed as [GameEvent] instances
      * TODO: @throws IllegalStateException if a game is in progress
      */
-    fun startAndObserveGameEvents(localPlayer: PlayerInfo, matching: Matching): Flow<GameEvent>
+    fun startAndObserveGameEvents(
+        localPlayer: PlayerInfo,
+        matching: Matching,
+        hashFleetBoard: HashMap<String, MutableList<Ship>>
+    ): Flow<GameEvent>
     /**
      * Quits the current game.
      * TODO: @throws IllegalStateException if a game is not in progress

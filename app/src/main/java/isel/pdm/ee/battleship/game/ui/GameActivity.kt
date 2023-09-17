@@ -14,6 +14,7 @@ import isel.pdm.ee.battleship.DependenciesContainer
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.TAG_MODEL
 import isel.pdm.ee.battleship.game.domain.Coordinate
+import isel.pdm.ee.battleship.game.domain.PlayerMarker
 import isel.pdm.ee.battleship.game.domain.Ship
 import isel.pdm.ee.battleship.game.domain.ShipType
 import isel.pdm.ee.battleship.game.domain.getResult
@@ -58,6 +59,7 @@ class GameActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val hashMapShip = viewModel.hashFleetBoard?.getOrNull()
         setContent {
             // This currentGame goes to the viewModel and says Im interested in the currentGame and I want to know when it changes
             // because Im using Flow and MutableStateFlow
@@ -68,7 +70,7 @@ class GameActivity: ComponentActivity() {
             val currentFleetInfo by viewModel.fleetInfo.collectAsState()
             val timeLimit = viewModel.timeLimit
             val currentState = viewModel.state
-            Log.v(TAG_MODEL, "Fleet info $mutableListShip")
+            //Log.v(TAG_MODEL, "Fleet info $mutableListShip")
             val title = when (currentState) {
                 MatchState.STARTING -> R.string.game_screen_starting
                 MatchState.IDLE -> R.string.game_screen_idle
@@ -95,6 +97,11 @@ class GameActivity: ComponentActivity() {
             }
         }
         if (viewModel.state == MatchState.IDLE) {
+            if (matching.player1==localPlayer) {
+                hashMapShip!![PlayerMarker.PLAYER1.name] = mutableListShip
+            } else {
+                hashMapShip!![PlayerMarker.PLAYER2.name] = mutableListShip
+            }
             viewModel.showShipsLayout(mutableListShip)
             viewModel.startMatch(localPlayer, matching)
         }
