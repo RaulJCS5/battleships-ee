@@ -182,7 +182,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
     private suspend fun postGameStarted(game: Game, gameId: String, playerMarker: PlayerMarker) {
         try {
             val gameDocRef = db.collection(ONGOING).document(gameId)
-            val playerBoardRef = gameDocRef.collection(playerMarker.name.lowercase()).document(BOARD_FIELD)
+            val playerBoardRef = gameDocRef.collection(playerMarker.other.name.lowercase()).document(BOARD_FIELD)
             playerBoardRef.set(game.board.toDocumentContent()).await()
             println("Game state saved to Firestore successfully.")
         }

@@ -66,7 +66,7 @@ class GameScreenViewModel(
         if (gameMonitor != null) {
             if (state == MatchState.STARTED) {
                 viewModelScope.launch {
-                    match.makeMove(at)
+                    //match.makeMove(at)
                     stopTimer()
                     _remainingTime.value = 0
                 }
