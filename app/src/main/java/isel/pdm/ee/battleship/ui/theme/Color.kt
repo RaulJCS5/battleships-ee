@@ -2,6 +2,7 @@ package isel.pdm.ee.battleship.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val Blue100 = Color(0xffc3daff)
 val Blue300 = Color(0xff6e8eff)
 val Blue500 = Color(0xff3d5afe)
 val Blue700 = Color(0xff0031ca)

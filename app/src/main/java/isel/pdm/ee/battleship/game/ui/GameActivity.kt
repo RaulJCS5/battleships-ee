@@ -65,6 +65,7 @@ class GameActivity: ComponentActivity() {
             // MutableStateFlow for the recomposition in the UI when the state changes
             val currentGame by viewModel.onGoingGame.collectAsState()
             val remainingTime by viewModel.remainingTime.collectAsState()
+            val currentFleetInfo by viewModel.fleetInfo.collectAsState()
             val timeLimit = viewModel.timeLimit
             val currentState = viewModel.state
             Log.v(TAG_MODEL, "Fleet info $mutableListShip")
@@ -74,7 +75,7 @@ class GameActivity: ComponentActivity() {
                 else -> null
             }
             GameScreen(
-                state = GameScreenState(title, currentGame),
+                state = GameScreenState(title, currentGame, currentFleetInfo),
                 onMoveRequested = { at -> viewModel.makeMove(at) },
                 onQuitGameRequested = { viewModel.quitGame() },
                 remainingTime = remainingTime,
@@ -94,6 +95,7 @@ class GameActivity: ComponentActivity() {
             }
         }
         if (viewModel.state == MatchState.IDLE) {
+            viewModel.showShipsLayout(mutableListShip)
             viewModel.startMatch(localPlayer, matching)
         }
         onBackPressedDispatcher.addCallback(owner = this, enabled = true) {

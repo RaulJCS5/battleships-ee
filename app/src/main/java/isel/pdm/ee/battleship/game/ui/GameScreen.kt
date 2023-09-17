@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import isel.pdm.ee.battleship.R
 import isel.pdm.ee.battleship.game.domain.Coordinate
 import isel.pdm.ee.battleship.game.domain.Game
+import isel.pdm.ee.battleship.game.domain.Ship
+import isel.pdm.ee.battleship.lobby.ui.mutableListShipPreview
+import isel.pdm.ee.battleship.lobby.ui.stringifyShipsLayout
 import isel.pdm.ee.battleship.ui.TopBar
 import isel.pdm.ee.battleship.ui.theme.BattleshipTheme
 
@@ -26,7 +29,8 @@ internal const val QuitGameButtonTag = "QuitGameButton"
 
 data class GameScreenState(
     @StringRes val title: Int?,
-    val game: Game
+    val game: Game,
+    val localShipsLayout: MutableList<Ship>? = null,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +68,13 @@ fun GameScreen(
                 }
                 Text(
                     text = stringResource(id = titleTextId),
-                    style = MaterialTheme.typography.displayMedium,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.testTag(GameScreenTitleTag)
+                )
+                Text(
+                    text = stringifyShipsLayout(state.localShipsLayout),
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.testTag(GameScreenTitleTag)
                 )
@@ -114,7 +124,8 @@ private fun DefineFleetPreview() {
     GameScreen(
         state = GameScreenState(
             title = R.string.game_screen_your_turn,
-            game = Game()
+            game = Game(),
+            localShipsLayout = mutableListShipPreview
         ),
         remainingTime = 115,
         timeLimit = 120

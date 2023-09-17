@@ -1,7 +1,11 @@
 package isel.pdm.ee.battleship.lobby.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import isel.pdm.ee.battleship.TAG
+import isel.pdm.ee.battleship.game.domain.Ship
+import isel.pdm.ee.battleship.game.ui.MatchState
 import isel.pdm.ee.battleship.lobby.domain.Lobby
 import isel.pdm.ee.battleship.lobby.domain.MatchingReceived
 import isel.pdm.ee.battleship.lobby.domain.PendingMatching
@@ -11,8 +15,10 @@ import isel.pdm.ee.battleship.lobby.domain.SentMatching
 import isel.pdm.ee.battleship.lobby.domain.StartMatching
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -25,6 +31,9 @@ class LobbyScreenViewModel(
 
     private val _players = MutableStateFlow<List<PlayerInfo>>(emptyList())
     val players = _players.asStateFlow()
+
+    private val _fleetInfo = MutableStateFlow<MutableList<Ship>>(mutableListOf<Ship>())
+    val fleetInfo = _fleetInfo.asStateFlow()
 
     private val _pendingMatching = MutableStateFlow<PendingMatching?>(null)
     val pendingMatching = _pendingMatching.asStateFlow()
@@ -51,6 +60,7 @@ class LobbyScreenViewModel(
                                 it != localPlayer
                             }
                         }
+
                         is MatchingReceived -> {
                             _pendingMatching.value = StartMatching(
                                 localPlayer = localPlayerUpdate,
@@ -89,7 +99,7 @@ class LobbyScreenViewModel(
         val currentLocalPlayer = localPlayer
         return if (currentMonitor != null && currentLocalPlayer != null) {
             viewModelScope.launch {
-                val createMatching = lobby.createMatching(to=opponent)
+                val createMatching = lobby.createMatching(to = opponent)
                 _pendingMatching.value = SentMatching(
                     localPlayer = currentLocalPlayer,
                     matching = createMatching
@@ -97,6 +107,23 @@ class LobbyScreenViewModel(
             }
         } else {
             null
+        }
+    }
+
+    fun showShipsLayout(mutableListShip: MutableList<Ship>) {
+        viewModelScope.launch {
+            callbackFlow<MutableList<Ship>> {
+                try {
+                    trySend(mutableListShip)
+                } catch (e: Exception) {
+                    Log.v(TAG, "Error: $e")
+                }
+                awaitClose {
+                    Log.v(TAG, "Closed")
+                }
+            }.collect {
+                _fleetInfo.value = it
+            }
         }
     }
 }

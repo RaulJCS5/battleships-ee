@@ -16,6 +16,7 @@ import isel.pdm.ee.battleship.game.domain.GameStarted
 import isel.pdm.ee.battleship.game.domain.Match
 import isel.pdm.ee.battleship.game.domain.OnGoing
 import isel.pdm.ee.battleship.game.domain.PlayerMarker
+import isel.pdm.ee.battleship.game.domain.Ship
 import isel.pdm.ee.battleship.game.domain.TimeEnded
 import isel.pdm.ee.battleship.game.domain.TimeUpdated
 import isel.pdm.ee.battleship.game.domain.getResult
@@ -23,8 +24,10 @@ import isel.pdm.ee.battleship.lobby.domain.Matching
 import isel.pdm.ee.battleship.lobby.domain.PlayerInfo
 import isel.pdm.ee.battleship.preferences.domain.UserInfoRepository
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
 enum class MatchState { IDLE, STARTING, STARTED, FINISHED }
@@ -41,6 +44,9 @@ class GameScreenViewModel(
 
     private val _remainingTime = MutableStateFlow(0)
     val remainingTime = _remainingTime.asStateFlow()
+
+    private val _fleetInfo = MutableStateFlow<MutableList<Ship>>(mutableListOf<Ship>())
+    val fleetInfo = _fleetInfo.asStateFlow()
 
     private var _state by mutableStateOf(MatchState.IDLE)
     val state: MatchState
@@ -126,10 +132,10 @@ class GameScreenViewModel(
                     if (_state == MatchState.FINISHED) {
                         var resultWinner:PlayerMarker? = null
                         resultWinner = if (winner != null) {
-                            Log.v(TAG_MODEL, "Winner: ${BoardResult.getWinner(winner!!)}")
+                            //Log.v(TAG_MODEL, "Winner: ${BoardResult.getWinner(winner!!)}")
                             BoardResult.getWinner(winner!!)
                         }else{
-                            Log.v(TAG_MODEL, "Quit game quitGameBy: ${it.game.quitGameBy}")
+                            //Log.v(TAG_MODEL, "Quit game quitGameBy: ${it.game.quitGameBy}")
                             it.game.quitGameBy?.other
                         }
                         if (resultWinner != null) {
@@ -193,6 +199,23 @@ class GameScreenViewModel(
         }
         else {
             Log.v(TAG, "No game no timer to stop")
+        }
+    }
+
+    fun showShipsLayout(mutableListShip: MutableList<Ship>) {
+        viewModelScope.launch {
+            callbackFlow<MutableList<Ship>> {
+                try {
+                    trySend(mutableListShip)
+                } catch (e: Exception) {
+                    Log.v(TAG, "Error: $e")
+                }
+                awaitClose {
+                    Log.v(TAG, "Closed")
+                }
+            }.collect {
+                _fleetInfo.value = it
+            }
         }
     }
 }

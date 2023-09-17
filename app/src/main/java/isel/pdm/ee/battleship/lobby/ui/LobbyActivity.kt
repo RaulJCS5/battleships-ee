@@ -55,8 +55,9 @@ class LobbyActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val players by viewModel.players.collectAsState()
+            val mutableListShip by viewModel.fleetInfo.collectAsState()
             LobbyScreen(
-                state = LobbyScreenState(players),
+                state = LobbyScreenState(players, mutableListShip),
                 onPlayerSelected = { player -> viewModel.sendMatching(player) },
                 onBackRequested = { finish() },
                 onPreferencesRequested = {
@@ -67,6 +68,7 @@ class LobbyActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.enterLobby()
+                viewModel.showShipsLayout(mutableListShip)
                 try {
                     viewModel.pendingMatching.collect {
                         if (it != null) {
