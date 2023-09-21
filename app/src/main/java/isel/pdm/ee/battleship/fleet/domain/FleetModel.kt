@@ -18,7 +18,7 @@ class AllShips() {
         shipList.getOrNull()?.add(Ship(ShipType.DESTROYER, null, "N"))
     }
     init {
-        fillFakeShipList()
+        fillEmptyShipList()
     }
     fun fillFakeShipList(){
         shipList.getOrNull()?.add(Ship(ShipType.CARRIER, Coordinate(0,0), "D"))
