@@ -19,6 +19,8 @@ data class Game(
  * TODO: @throws IllegalStateException if its an invalid move, either because its not the local player's turn or the move cannot be made on that location
  */
 fun Game.makeMove(at: Coordinate, mutableFleetList: MutableList<Ship>?): Game {
+    // When make a move and does not happen nothing, the game is not updated
+    // TODO: makeMove Exception: Check failed. java.lang.IllegalStateException: Check failed.
     check(localPlayerMarker == board.turn && mutableFleetList != null)
     return copy(board = board.makeMove(at, mutableFleetList))
 }

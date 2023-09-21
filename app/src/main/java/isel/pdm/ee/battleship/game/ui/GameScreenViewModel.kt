@@ -146,6 +146,7 @@ class GameScreenViewModel(
                                 it.game.quitGameBy?.other
                             }
                             if (resultWinner != null) {
+                                // TODO: ??????
                                 match.saveGameAndUpdate(localPlayerInfo, resultWinner, onGoingGame.value.localPlayerMarker)
                             }
                             stopTimer()

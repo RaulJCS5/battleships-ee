@@ -361,6 +361,7 @@ class MatchFirebase(private val db: FirebaseFirestore) : Match {
         localPlayerMarker: PlayerMarker
     ) {
         //Log.v(TAG_MODEL, "resultWinner: $resultWinner localPlayerMarker: $localPlayerMarker")
+        // TODO: ??????
         val gameId = onGoingGame!!.second
         val gameDocRef = db.collection(SAVE_GAME).document(localPlayer.info.nick)
         val isWinner = resultWinner == localPlayerMarker
