@@ -30,6 +30,7 @@ class FleetActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.updateFleetBoard()
         setContent {
             val setFleetBoard = viewModel.fleetBoard?.getOrNull()
             val allShips = viewModel.allShipsAndLayouts?.getOrNull()

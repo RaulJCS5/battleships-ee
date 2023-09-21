@@ -50,54 +50,10 @@ class FleetViewModel(
             val listListMarker = fleetBoard?.getOrNull()?.tiles
             allShipsAndLayouts?.getOrNull()?.map {
                 if (it.coordinate == null) {
-                    val shipSize = getSizeByName(it.shipType.name)-1
-                    listListMarker?.mapIndexed { row, listMarker ->
-                        if (it.orientation.equals("U")) {
-                            for (i in 0..shipSize) {
-                                if (row == at.row - i) {
-                                    listMarker[at.column] = PositionStateBoard(at,
-                                        wasShoot = false,
-                                        wasShip = true,
-                                        null,
-                                        null
-                                    )
-                                }
-                            }
-                        } else if (it.orientation.equals("D")) {
-                            for (i in 0..shipSize) {
-                                if (row == at.row + i) {
-                                    listMarker[at.column] = PositionStateBoard(at,
-                                        wasShoot = false,
-                                        wasShip = true,
-                                        null,
-                                        null
-                                    )
-                                }
-                            }
-                        } else if (it.orientation.equals("L")) {
-                            for (i in 0..shipSize) {
-                                if (row == at.row) {
-                                    listMarker[at.column - i] = PositionStateBoard(at,
-                                        wasShoot = false,
-                                        wasShip = true,
-                                        null,
-                                        null
-                                    )
-                                }
-                            }
-                        } else if (it.orientation.equals("R")) {
-                            for (i in 0..shipSize) {
-                                if (row == at.row) {
-                                    listMarker[at.column + i] = PositionStateBoard(at,
-                                        wasShoot = false,
-                                        wasShip = true,
-                                        null,
-                                        null
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    setShips(it, listListMarker, at)
+                }
+                else{
+                    setShips(it, listListMarker,null)
                 }
             }
             setShipLayoutReferenceLayout(at)
@@ -113,6 +69,66 @@ class FleetViewModel(
             _fleetBoard = Result.failure(e)
         }
     }
+    private fun setShips(
+        it: Ship,
+        listListMarker: MutableList<MutableList<PositionStateBoard>>?,
+        coord: Coordinate?
+    ){
+        val shipSize = getSizeByName(it.shipType.name) - 1
+        val coordinate = coord ?: it.coordinate!!
+        listListMarker?.mapIndexed { row, listMarker ->
+            if (it.orientation.equals("U")) {
+                for (i in 0..shipSize) {
+                    if (row == coordinate.row - i) {
+                        listMarker[coordinate.column] = PositionStateBoard(
+                            coordinate,
+                            wasShoot = false,
+                            wasShip = true,
+                            null,
+                            null
+                        )
+                    }
+                }
+            } else if (it.orientation.equals("D")) {
+                for (i in 0..shipSize) {
+                    if (row == coordinate.row + i) {
+                        listMarker[coordinate.column] = PositionStateBoard(
+                            coordinate,
+                            wasShoot = false,
+                            wasShip = true,
+                            null,
+                            null
+                        )
+                    }
+                }
+            } else if (it.orientation.equals("L")) {
+                for (i in 0..shipSize) {
+                    if (row == coordinate.row) {
+                        listMarker[coordinate.column - i] = PositionStateBoard(
+                            coordinate,
+                            wasShoot = false,
+                            wasShip = true,
+                            null,
+                            null
+                        )
+                    }
+                }
+            } else if (it.orientation.equals("R")) {
+                for (i in 0..shipSize) {
+                    if (row == coordinate.row) {
+                        listMarker[coordinate.column + i] = PositionStateBoard(
+                            coordinate,
+                            wasShoot = false,
+                            wasShip = true,
+                            null,
+                            null
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun setShipLayoutReferenceLayout(at:Coordinate) {
         val updated = _allShipsAndLayouts?.getOrNull()?.map {
             if (!it.orientation.equals("N")&&it.coordinate==null) {
@@ -123,6 +139,15 @@ class FleetViewModel(
         }
         if (updated!=null)
             _allShipsAndLayouts = Result.success(updated.toMutableList())
+    }
+
+    fun updateFleetBoard() {
+        allShipsAndLayouts?.getOrNull()?.map {
+            if (it.coordinate != null) {
+                updateFleetBoard(it.coordinate)
+                //setShipLayout(it.shipType.name, it.orientation)
+            }
+        }
     }
 
     private var _allShipsAndLayouts by mutableStateOf<Result<MutableList<Ship>>?>(
