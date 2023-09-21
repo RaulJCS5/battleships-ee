@@ -92,9 +92,6 @@ class GameActivity: ComponentActivity() {
                 )
                 else -> { }
             }
-            if (currentGame.localPlayerMarker == currentGame.board.turn) {
-                viewModel.startTimer()
-            }
         }
         if (viewModel.state == MatchState.IDLE) {
             if (matching.player1==localPlayer) {

@@ -12,6 +12,8 @@
     <string name="game_screen_opponent_turn">Opponent\'s turn</string>
     <string name="game_screen_quit_game">Quit game</string>
     <string name="game_screen_idle">Idle</string>
+    <string name="game_screen_started">Start</string>
+    <string name="game_screen_finished">Finish</string>
     <string name="timer">Timer: </string>
     <string name="match_ended_dialog_text_tied_match">The match is tied</string>
     <string name="match_ended_dialog_text_local_won">Congratulations, you won!</string>

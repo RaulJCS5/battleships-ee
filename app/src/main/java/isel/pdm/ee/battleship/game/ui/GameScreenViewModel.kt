@@ -68,8 +68,6 @@ class GameScreenViewModel(
                 viewModelScope.launch {
                     Log.v(TAG_MODEL, "hashFleetBoard: $hashFleetBoard")
                     match.makeMove(at)
-                    stopTimer()
-                    _remainingTime.value = 0
                 }
             } else {
                 Log.v(TAG, "No move")
@@ -87,7 +85,7 @@ class GameScreenViewModel(
                     //gameMonitor?.first?.cancel()
                     gameMonitor = null
                     match.quitGame()
-                    stopTimer()
+                    //stopTimer()
                 }
             else {
                 Log.v(TAG, "No quit game")
@@ -150,8 +148,10 @@ class GameScreenViewModel(
                             if (resultWinner != null) {
                                 match.saveGameAndUpdate(localPlayerInfo, resultWinner, onGoingGame.value.localPlayerMarker)
                             }
+                            stopTimer()
                             match.end()
                         }
+                        startTimer()
                     }
                 }
             }
@@ -165,49 +165,43 @@ class GameScreenViewModel(
     }
 
     fun startTimer() {
+        stopTimer()
         if (gameMonitor != null) {
             if (state == MatchState.STARTED) {
-                timerJob = viewModelScope.launch {
-                    match.startTimer(_remainingTime.value, timeLimit).collect {
-                        when (it) {
-                            is TimeEnded -> {
-                                match.quitGame()
-                                stopTimer()
-                                //_remainingTime.value = timeLimit
-                            }
-
-                            is TimeUpdated -> {
-                                _remainingTime.value = it.time
-                            }
-
-                            else -> {
-                                Log.v(TAG, "No time")
+                if (timerJob == null) {
+                    if (onGoingGame.value.localPlayerMarker == onGoingGame.value.board.turn) {
+                        timerJob = viewModelScope.launch {
+                            while (remainingTime.value < timeLimit) {
+                                _remainingTime.value = remainingTime.value + 1
+                                Log.v(TAG, "Remaining time: ${remainingTime.value}")
+                                kotlinx.coroutines.delay(1000)
                             }
                         }
+                    } else {
+                        Log.v(TAG, "Not my turn")
                     }
+                } else {
+                    Log.v(TAG, "Timer already started")
                 }
             } else {
                 Log.v(TAG, "No start timer")
             }
-        }
-        else {
+        } else {
             Log.v(TAG, "No game no start timer")
         }
     }
 
     private fun stopTimer() {
         if (gameMonitor != null) {
-            if (timerJob == null) {
-                Log.v(TAG, "No timer to stop")
-                return
-            } else {
-                //_remainingTime.value = 0
+            if (timerJob != null) {
                 timerJob?.cancel()
                 timerJob = null
+                _remainingTime.value = 0
                 Log.v(TAG, "Timer stopped")
+            } else {
+                Log.v(TAG, "No timer to stop")
             }
-        }
-        else {
+        } else {
             Log.v(TAG, "No game no timer to stop")
         }
     }
